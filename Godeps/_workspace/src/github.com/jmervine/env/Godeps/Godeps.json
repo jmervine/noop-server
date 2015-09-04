@@ -1,0 +1,16 @@
+{
+	"ImportPath": "github.com/jmervine/env",
+	"GoVersion": "go1.5",
+	"Deps": [
+		{
+			"ImportPath": "github.com/jmervine/GoT",
+			"Comment": "v1",
+			"Rev": "ffdd9e44910a762e6410b7a6f4c8c7b506b4daeb"
+		},
+		{
+			"ImportPath": "github.com/joho/godotenv",
+			"Comment": "v1-8-g443e926",
+			"Rev": "443e926da0d793d3b3f32118b1e4ba52ada26503"
+		}
+	]
+}

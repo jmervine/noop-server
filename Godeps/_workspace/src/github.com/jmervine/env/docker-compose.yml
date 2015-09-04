@@ -1,0 +1,22 @@
+# run tests in docker
+test:
+  image: golang:1.5
+  working_dir: /go/src/github.com/jmervine/env
+  volumes:
+    - .:/go/src/github.com/jmervine/env
+  command: go test .
+
+cover:
+  image: golang:1.5
+  working_dir: /go/src/github.com/jmervine/env
+  volumes:
+    - .:/go/src/github.com/jmervine/env
+  command: go test -cover -race .
+
+verbose:
+  image: golang:1.5
+  working_dir: /go/src/github.com/jmervine/env
+  volumes:
+    - .:/go/src/github.com/jmervine/env
+  command: go test -v -race -cover .
+
