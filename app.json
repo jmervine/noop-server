@@ -1,0 +1,9 @@
+{
+  "name": "noop-server",
+  "description": "A simple noop server that accepts everything.",
+  "website": "https://github.com/jmervine/noop-server",
+  "success_url": "/",
+  "logo": "http://www.gravatar.com/avatar/ed808193b8c2c8516715816f90a005b2.jpg?s=75",
+  "keywords": ["golang", "testing", "noop", "web-server", "server"]
+}
+
