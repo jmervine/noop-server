@@ -70,3 +70,17 @@ Content-Length: 10
 Not Found
 ```
 
+## Sample using a quick start function
+
+```
+## Noop Server - Clean http listener
+function listen {
+  local port="$1"
+  local addr="$2"
+
+  [[ -z $port ]] && port=3000
+  [[ -z $addr ]] && addr=0.0.0.0
+
+  docker run --rm -it -p "$port:$port" -e PORT=$port -e ADDR=$addr jmervine/noop-server
+}
+```
