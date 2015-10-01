@@ -38,7 +38,7 @@ func main() {
 			status := http.StatusOK
 
 			defer func() {
-				log.Print("method", m, "path", r.URL.Path, "status", status, "took", time.Since(begin))
+				log.Print("method", r.Method, "path", r.URL.Path, "status", status, "took", time.Since(begin))
 			}()
 
 			http.Error(w, http.StatusText(200), 200)
@@ -49,7 +49,7 @@ func main() {
 			status := http.StatusOK
 
 			defer func(s int) {
-				log.Print("method", m, "path", r.URL.Path, "status", s, "took", time.Since(begin))
+				log.Print("method", r.Method, "path", r.URL.Path, "status", s, "took", time.Since(begin))
 			}(status)
 
 			i, _ := strconv.ParseInt(p.ByName("status"), 10, 16)
