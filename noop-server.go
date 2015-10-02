@@ -42,6 +42,7 @@ func main() {
 			defer func() {
 				log.Print("method", r.Method, "path", r.URL.Path, "status", status, "took", time.Since(begin))
 				if env.GetBool("VERBOSE") {
+					log.Debug("method", r.Method, "path", r.URL.Path, "headers", r.Header)
 					body, err := ioutil.ReadAll(r.Body)
 					if err == nil {
 						log.Debug("method", r.Method, "path", r.URL.Path, "body", string(body))
@@ -60,6 +61,7 @@ func main() {
 			defer func(s int) {
 				log.Print("method", r.Method, "path", r.URL.Path, "status", s, "took", time.Since(begin))
 				if env.GetBool("VERBOSE") {
+					log.Debug("method", r.Method, "path", r.URL.Path, "headers", r.Header)
 					body, err := ioutil.ReadAll(r.Body)
 					if err == nil {
 						log.Debug("method", r.Method, "path", r.URL.Path, "body", string(body))

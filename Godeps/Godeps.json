@@ -9,8 +9,8 @@
 		},
 		{
 			"ImportPath": "github.com/jmervine/readable",
-			"Comment": "v1",
-			"Rev": "c225abb70b07c02d574b66e3a49f652ec5363e71"
+			"Comment": "v1.2",
+			"Rev": "6f6c7afbdd1b1eca4233f0e689c7de608e5f364c"
 		},
 		{
 			"ImportPath": "github.com/joho/godotenv",
