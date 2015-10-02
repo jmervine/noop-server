@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -18,6 +19,7 @@ func init() {
 	log.SetPrefix("[noop-server]:")
 	log.SetOutput(os.Stdout)
 	log.SetFlags(0)
+	log.SetDebug(env.GetBool("VERBOSE"))
 }
 
 func main() {
@@ -39,6 +41,13 @@ func main() {
 
 			defer func() {
 				log.Print("method", r.Method, "path", r.URL.Path, "status", status, "took", time.Since(begin))
+				if env.GetBool("VERBOSE") {
+					body, err := ioutil.ReadAll(r.Body)
+					if err == nil {
+						log.Debug("method", r.Method, "path", r.URL.Path, "body", string(body))
+					}
+				}
+
 			}()
 
 			http.Error(w, http.StatusText(200), 200)
@@ -50,6 +59,12 @@ func main() {
 
 			defer func(s int) {
 				log.Print("method", r.Method, "path", r.URL.Path, "status", s, "took", time.Since(begin))
+				if env.GetBool("VERBOSE") {
+					body, err := ioutil.ReadAll(r.Body)
+					if err == nil {
+						log.Debug("method", r.Method, "path", r.URL.Path, "body", string(body))
+					}
+				}
 			}(status)
 
 			i, _ := strconv.ParseInt(p.ByName("status"), 10, 16)
@@ -62,6 +77,6 @@ func main() {
 	}
 
 	log.Print("at=main on=startup addr", env.Get("ADDR"), "port", env.Get("PORT"))
-	log.Fatal(http.ListenAndServe(env.GetString("ADDR")+":"+env.GetString("PORT"), router))
+	log.Fatal(http.ListenAndServe(env.Get("ADDR")+":"+env.Get("PORT"), router))
 
 }
