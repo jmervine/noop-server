@@ -2,6 +2,9 @@
 
 A simple noop server that accepts everything.
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+
 ## run
 
 ### w/ docker
