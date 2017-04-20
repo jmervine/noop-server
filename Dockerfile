@@ -1,4 +1,4 @@
-FROM     golang:1.5
+FROM     golang:latest
 ENV      SRC_DIR=/go/src/github.com/jmervine/noop-server
 ADD      . ${SRC_DIR}
 WORKDIR  ${SRC_DIR}
