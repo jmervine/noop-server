@@ -1,6 +1,7 @@
 {
 	"ImportPath": "github.com/jmervine/noop-server",
-	"GoVersion": "go1.5",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v74",
 	"Deps": [
 		{
 			"ImportPath": "github.com/jmervine/env",
@@ -8,14 +9,14 @@
 			"Rev": "7e0c68bcca123e43c657b1a091033a3aff1f15a3"
 		},
 		{
+			"ImportPath": "github.com/jmervine/env/Godeps/_workspace/src/github.com/joho/godotenv",
+			"Comment": "v1.0.1",
+			"Rev": "7e0c68bcca123e43c657b1a091033a3aff1f15a3"
+		},
+		{
 			"ImportPath": "github.com/jmervine/readable",
 			"Comment": "v1.2",
 			"Rev": "6f6c7afbdd1b1eca4233f0e689c7de608e5f364c"
-		},
-		{
-			"ImportPath": "github.com/joho/godotenv",
-			"Comment": "v1-8-g443e926",
-			"Rev": "443e926da0d793d3b3f32118b1e4ba52ada26503"
 		},
 		{
 			"ImportPath": "github.com/julienschmidt/httprouter",

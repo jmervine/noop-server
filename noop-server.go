@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jmervine/noop-server/Godeps/_workspace/src/github.com/jmervine/env"
-	log "github.com/jmervine/noop-server/Godeps/_workspace/src/github.com/jmervine/readable"
-	"github.com/jmervine/noop-server/Godeps/_workspace/src/github.com/julienschmidt/httprouter"
+	"github.com/jmervine/env"
+	log "github.com/jmervine/readable"
+	"github.com/julienschmidt/httprouter"
 )
 
 func init() {
