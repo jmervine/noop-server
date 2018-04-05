@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/jmervine/env"
 	log "github.com/jmervine/readable"
-	"github.com/julienschmidt/httprouter"
 )
 
 func init() {
@@ -23,18 +23,8 @@ func init() {
 }
 
 func main() {
-	router := httprouter.New()
 
-	methods := []string{
-		"DELETE",
-		"GET",
-		"HEAD",
-		"POST",
-		"OPTIONS",
-		"PUT",
-	}
-
-	baseHandler := func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		begin := time.Now()
 		status := http.StatusOK
 
@@ -47,40 +37,21 @@ func main() {
 					log.Debug("method", r.Method, "path", r.URL.Path, "body", string(body))
 				}
 			}
-
 		}()
 
-		http.Error(w, http.StatusText(200), 200)
-	}
-
-	for _, m := range methods {
-		router.Handle(m, "/", baseHandler)
-		router.Handle(m, "/services/*uripath", baseHandler)
-		router.Handle(m, "/status/:status", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-			begin := time.Now()
-			status := http.StatusOK
-
-			defer func(s int) {
-				log.Print("method", r.Method, "path", r.URL.Path, "status", s, "took", time.Since(begin))
-				if env.GetBool("VERBOSE") {
-					log.Debug("method", r.Method, "path", r.URL.Path, "headers", r.Header)
-					body, err := ioutil.ReadAll(r.Body)
-					if err == nil {
-						log.Debug("method", r.Method, "path", r.URL.Path, "body", string(body))
-					}
-				}
-			}(status)
-
-			i, _ := strconv.ParseInt(p.ByName("status"), 10, 16)
-			if i > 99 {
+		statusHeader := r.Header.Get("X-HTTP-Status")
+		if statusHeader != "" {
+			i, e := strconv.ParseInt(statusHeader, 10, 16)
+			if e == nil {
 				status = int(i)
+			} else {
+				status = 500
 			}
+		}
 
-			http.Error(w, http.StatusText(status), status)
-		})
-	}
+		http.Error(w, fmt.Sprintf("%d %s", status, http.StatusText(status)), status)
+	})
 
 	log.Print("at=main on=startup addr", env.Get("ADDR"), "port", env.Get("PORT"))
-	log.Fatal(http.ListenAndServe(env.Get("ADDR")+":"+env.Get("PORT"), router))
-
+	log.Fatal(http.ListenAndServe(env.Get("ADDR")+":"+env.Get("PORT"), nil))
 }
