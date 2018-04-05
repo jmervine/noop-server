@@ -34,27 +34,29 @@ func main() {
 		"PUT",
 	}
 
-	for _, m := range methods {
-		router.Handle(m, "/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-			begin := time.Now()
-			status := http.StatusOK
+	baseHandler := func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		begin := time.Now()
+		status := http.StatusOK
 
-			defer func() {
-				log.Print("method", r.Method, "path", r.URL.Path, "status", status, "took", time.Since(begin))
-				if env.GetBool("VERBOSE") {
-					log.Debug("method", r.Method, "path", r.URL.Path, "headers", r.Header)
-					body, err := ioutil.ReadAll(r.Body)
-					if err == nil {
-						log.Debug("method", r.Method, "path", r.URL.Path, "body", string(body))
-					}
+		defer func() {
+			log.Print("method", r.Method, "path", r.URL.Path, "status", status, "took", time.Since(begin))
+			if env.GetBool("VERBOSE") {
+				log.Debug("method", r.Method, "path", r.URL.Path, "headers", r.Header)
+				body, err := ioutil.ReadAll(r.Body)
+				if err == nil {
+					log.Debug("method", r.Method, "path", r.URL.Path, "body", string(body))
 				}
+			}
 
-			}()
+		}()
 
-			http.Error(w, http.StatusText(200), 200)
-		})
+		http.Error(w, http.StatusText(200), 200)
+	}
 
-		router.Handle(m, "/:status", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	for _, m := range methods {
+		router.Handle(m, "/", baseHandler)
+		router.Handle(m, "/services/*uripath", baseHandler)
+		router.Handle(m, "/status/:status", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 			begin := time.Now()
 			status := http.StatusOK
 
