@@ -5,16 +5,6 @@
 
 Simple configuration utility around os.{Get,Set}env
 
-#### Why?
-
-- At it's core, this wraps `os.Getenv` and `os.Setenv` with helpers around cast
-specific types.
-
-- In Go, the underlying environment is cloned at startup time. Store configurations in that environment is a simple and easy place for shared configuration.
-
-- See [12factor.net/config](http://12factor.net/config)
-
-
 ## usage
 
 ```
@@ -29,43 +19,38 @@ package env
 
     Example:
 
-        package main
+	package main
 
-        import (
-            ".." // "github.com/jmervine/env"
+	import (
+		"github.com/jmervine/env"
 
-            "fmt"
-        )
+		"fmt"
+	)
 
-        func init() {
-            env.PanicOnRequire = true
-            var err error
-            err = env.Load("_example/example.env")
-            if err != nil {
-                // work in _example
-                err = env.Load("example.env")
-                if err != nil {
-                    panic(err)
-                }
-            }
+	func main() {
+		var err error
+		err = env.Load("example.env")
+		if err != nil {
+	  	panic(err)
+		}
 
-            // ensure requires
-            env.Require("DATABASE_URL")
-        }
+		env.PanicOnRequire = true
 
-        func main() {
-            fmt.Printf("dburl   ::: %s\n", env.Get("DATABASE_URL"))
-            fmt.Printf("addr    ::: %s\n", env.Get("ADDR"))
-            fmt.Printf("port    ::: %d\n", env.GetInt("PORT"))
+		d, _ := env.Require("DATABASE_URL")
+		var (
+			dburl   = d
+			ignored = env.GetOrSetBool("IGNORED", true)
+			debug   = env.GetBool("DEBUG")
+			addr    = env.GetString("ADDR")
+			port    = env.GetOrSetInt("PORT", 3000)
+		)
 
-            if env.GetBool("IGNORED") {
-                fmt.Printf("ignored ::: %v\n", env.GetBool("IGNORED"))
-            }
-
-            if env.GetBool("DEBUG") {
-                fmt.Printf("debug   ::: %v\n", env.GetBool("DEBUG"))
-            }
-        }
+		fmt.Printf("dburl   ::: %s\n", dburl)
+		fmt.Printf("ignored ::: %v\n", ignored)
+		fmt.Printf("debug   ::: %v\n", debug)
+		fmt.Printf("addr    ::: %s\n", addr)
+		fmt.Printf("port    ::: %d\n", port)
+	}
 
 VARIABLES
 
@@ -157,31 +142,6 @@ func Set(key string, val interface{})
 func SetMap(m map[string]interface{})
     SetMap iterates over a map and sets keys to values
 
-```
-
-## development
-
-#### stdlib
-
-```bash
-go test -race -cover .
-
-# please include output in any pull requests
-```
-
-#### w/ docker and docker-compose
-
-> This is how I do it.
-
-```bash
-# basic
-docker-compose run test
-
-# basic w/ coverage
-docker-compose run verbose
-
-# verobse w/ coverage and race
-docker-compose run cover
 ```
 
 ## LICENSE
