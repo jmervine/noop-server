@@ -15,7 +15,14 @@ import (
 func init() {
 	// set default port if not set
 	env.GetOrSetInt("PORT", 3000)
+	env.GetOrSetString("ADDR", "0.0.0.0")
 
+	app := os.Getenv("APP_NAME")
+	if app == "" {
+		app = "noop-server"
+	}
+
+	log.SetPrefix("app=" + app + " ")
 	log.SetOutput(os.Stdout)
 	log.SetFlags(0)
 }
