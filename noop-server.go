@@ -8,18 +8,31 @@ import (
 	"os"
 	"strconv"
 	"time"
+)
 
-	"github.com/jmervine/env"
+var (
+	port, addr, app string
+	verbose         bool
 )
 
 func init() {
-	// set default port if not set
-	env.GetOrSetInt("PORT", 3000)
-	env.GetOrSetString("ADDR", "0.0.0.0")
+	port = os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
 
-	app := os.Getenv("APP_NAME")
+	addr = os.Getenv("ADDR")
+	if addr == "" {
+		addr = "0.0.0.0"
+	}
+
+	app = os.Getenv("APP_NAME")
 	if app == "" {
 		app = "noop-server"
+	}
+
+	if os.Getenv("VERBOSE") != "" {
+		verbose = true
 	}
 
 	log.SetPrefix("app=" + app + " ")
@@ -36,7 +49,7 @@ func main() {
 		defer func() {
 			logPrefix := fmt.Sprintf("at=main on=http.HandleFunc method=%s path=%s", r.Method, r.URL.Path)
 			log.Printf("%s status=%d took=%v\n", logPrefix, status, time.Since(begin))
-			if env.GetBool("VERBOSE") {
+			if verbose {
 				log.Printf("%s headers:\n%s", r.Header)
 				body, err := ioutil.ReadAll(r.Body)
 				if err == nil {
@@ -58,6 +71,6 @@ func main() {
 		http.Error(w, fmt.Sprintf("%d %s", status, http.StatusText(status)), status)
 	})
 
-	log.Printf("at=main on=startup addr=%s port=%s\n", env.Get("ADDR"), env.Get("PORT"))
-	log.Fatal(http.ListenAndServe(env.Get("ADDR")+":"+env.Get("PORT"), nil))
+	log.Printf("at=main on=startup addr=%s port=%s\n", addr, port)
+	log.Fatal(http.ListenAndServe(addr+":"+port, nil))
 }
