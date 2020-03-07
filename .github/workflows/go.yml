@@ -25,6 +25,7 @@ jobs:
       run: go test -v -race ./...
 
     - name: Build
-      uses: docker
-      image: Dockerfile
+      uses: actions/docker@v1
+      with:
+        image: 'Dockerfile'
       if: success()
