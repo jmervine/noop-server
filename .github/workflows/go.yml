@@ -23,9 +23,3 @@ jobs:
 
     - name: Test
       run: go test -v -race ./...
-
-    - name: Build
-      uses: actions/docker@v1
-      with:
-        image: 'Dockerfile'
-      if: success()
