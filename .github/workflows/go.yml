@@ -26,5 +26,5 @@ jobs:
 
     - name: Build
       uses: docker
-      with: Dockerfile
+      image: Dockerfile
       if: success()
