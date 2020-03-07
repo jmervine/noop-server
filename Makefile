@@ -1,4 +1,7 @@
-default: build push
+default: test build
+
+test:
+	go test -v -race ./...
 
 build:
 	docker build -t jmervine/noop-server:latest .
