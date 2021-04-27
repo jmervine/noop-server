@@ -90,7 +90,9 @@ function listen {
 
 ## mTLS Support
 
-**Warning: You kind of need to know a bit about TLS and mTLS to use this feature.**
+**Warnings:**
+* You kind of need to know a bit about TLS and mTLS to use this feature.
+* mTLS mode (specifically TLS) does not work on Heroku.
 
 The mTLS support was added fairly quickly to support a test case I needed. Thus
 it's had limited testing and use.
