@@ -87,3 +87,44 @@ function listen {
   docker run --rm -it -p "$port:$port" -e PORT=$port -e ADDR=$addr jmervine/noop-server
 }
 ```
+
+## mTLS Support
+
+**Warning: You kind of need to know a bit about TLS and mTLS to use this feature.**
+
+The mTLS support was added fairly quickly to support a test case I needed. Thus
+it's had limited testing and use.
+
+I have left my example certs in this repo under [examples/mtls](examples/mtls).
+
+### Running the server
+
+You need the following files:
+* Self-signed server cert exported to `TLS_CERT`.
+* Self-signed server key exported to `TLS_KEY`.
+* Self-signed server CA chain cert exported to `MTLS_CA_CHAIN_CERT`.
+
+> _Note: You need to export the contents of these files, not the paths. Example:_
+>
+> ```
+> export MTLS_CA_CHAIN_CERT="`cat examples/mtls/server/ca-chain.cert.pem`"
+> export TLS_CERT="`cat examples/mtls/server/localhost.cert.pem`"
+> export TLS_KEY="`cat examples/mtls/server/localhost.key.pem`"
+> ```
+
+### Connecting via curl
+
+You then need to connect using the coorosponding client cert and key and the
+server ca chain cert. Example:
+```
+export CURL_KEY=examples/mtls/client/localhost.key.pem
+export CURL_CERT=examples/mtls/client/localhost.cert.pem
+export CURL_CACERT=examples/mtls/server/ca-chain.cert.pem
+
+curl -v --cacert $CURL_CACERT --cert $CURL_CERT --key $CURL_KEY https://localhost:3000
+```
+
+### Generating the certs
+
+I used the generate.sh script from https://github.com/nicholasjackson/mtls-go-example/.
+I then copied the generated certs out for my use.
