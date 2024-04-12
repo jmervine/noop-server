@@ -11,6 +11,6 @@ RUN set -x; \
 
 FROM alpine:3
 WORKDIR /src
-COPY --from=builder /go/src/github.com/jmervine/noop-server/noop-server .
+COPY --from=builder /go/src/github.com/jmervine/noop-server/bin/noop-server .
 
 CMD /src/noop-server
