@@ -1,9 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -72,9 +73,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s status=%d took=%v\n", logPrefix, status, time.Since(begin))
 		if verbose {
 			log.Printf("%s headers:\n%s", logPrefix, r.Header)
-			body, err := ioutil.ReadAll(r.Body)
+			//body, err := ioutil.ReadAll(r.Body)
+			body := &bytes.Buffer{}
+			_, err := io.Copy(body, r.Body)
 			if err == nil {
-				log.Printf("%s body:\n%s", logPrefix, string(body))
+				log.Printf("%s body:\n%s", logPrefix, body.String())
 			}
 		}
 	}()
