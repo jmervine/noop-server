@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"crypto/tls"
@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-func addMTLSSupportToServer(server *http.Server) {
+func addMTLSSupportToServer(server *http.Server, ca string) {
 	// Add the cert chain as the intermediate signs both the servers and the clients certificates
-	clientCACert := []byte(mtlsCert)
+	clientCACert := []byte(ca)
 
 	clientCertPool := x509.NewCertPool()
 	clientCertPool.AppendCertsFromPEM(clientCACert)
@@ -21,8 +21,6 @@ func addMTLSSupportToServer(server *http.Server) {
 		PreferServerCipherSuites: true,
 		MinVersion:               tls.VersionTLS12,
 	}
-
-	tlsConfig.BuildNameToCertificate()
 
 	server.TLSConfig = tlsConfig
 }
@@ -48,13 +46,18 @@ func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {
 	return tc, nil
 }
 
-func listenAndServeTLSKeyPair(server *http.Server, cert tls.Certificate) error {
+func listenAndServeWithTls(server *http.Server, cert string, key string) error {
+	crt, err := tls.X509KeyPair([]byte(cert), []byte(key))
+	if err != nil {
+		return err
+	}
+
 	config := &tls.Config{}
 	config.NextProtos = []string{"http/1.1"}
 	config.Certificates = make([]tls.Certificate, 1)
-	config.Certificates[0] = cert
+	config.Certificates[0] = crt
 
-	ln, err := net.Listen("tcp", listener)
+	ln, err := net.Listen("tcp", server.Addr)
 	if err != nil {
 		return err
 	}

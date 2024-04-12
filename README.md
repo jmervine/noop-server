@@ -4,6 +4,22 @@ A simple noop server that accepts everything.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
+## dev
+
+```
+# tests
+make test
+
+# run
+make run
+
+# run directly
+go run ./cmd/noop-server
+go run ./cmd/noop-server --help
+
+# build bin
+make bin/noop-server
+```
 
 ## run
 
@@ -12,6 +28,9 @@ A simple noop server that accepts everything.
 ```
 go install github.com/jmervine/noop-server
 VERBOSE=true PORT=3333 noop-server
+
+# OR
+noop-server -v -p 3333
 ```
 
 ### w/ docker
@@ -26,13 +45,6 @@ docker run --rm -it -p 3000:3000 jmervine/noop-server:latest
 # fork and/or clone
 docker-compose build
 docker-compose up
-```
-
-### w/o docker
-
-```
-# fork and/or clone
-go run noop-server.go
 ```
 
 ## use
@@ -109,9 +121,9 @@ I have left my example certs in this repo under [examples/mtls](examples/mtls).
 ### Running the server
 
 You need the following files:
-* Self-signed server cert exported to `TLS_CERT`.
-* Self-signed server key exported to `TLS_KEY`.
-* Self-signed server CA chain cert exported to `MTLS_CA_CHAIN_CERT`.
+* Self-signed server cert exported to `TLS_PRIVATE_PATH`.
+* Self-signed server key exported to `TLS_KEY_PATH`.
+* Self-signed server CA chain cert exported to `MTLS_CA_CHAIN_PATH`.
 
 > _Note: You need to export the contents of these files, not the paths. Example:_
 >
