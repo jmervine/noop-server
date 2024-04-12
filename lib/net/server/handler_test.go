@@ -1,19 +1,10 @@
 package server
 
 import (
-	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
-
-func init() {
-	if _, ok := os.LookupEnv("TEST_WITH_LOGGING"); !ok {
-		log.SetOutput(io.Discard)
-	}
-}
 
 func TestGet(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(handlerFunc))
