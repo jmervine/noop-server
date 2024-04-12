@@ -10,57 +10,18 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/jmervine/noop-server/lib/config"
 )
 
 var (
-	port, addr, app, listener string
-	mtlsCert, tlsCert, tlsKey string
-	verbose, mtls, stls       bool
-	cert                      tls.Certificate
+	cfg  config.Config
+	cert tls.Certificate
 )
 
 func init() {
-	var ok bool
-
 	log.SetOutput(os.Stdout)
 	log.SetFlags(0)
-
-	if app, ok = os.LookupEnv("APP_NAME"); !ok {
-		app = "noop-server"
-	}
-
-	log.SetPrefix(fmt.Sprintf("app=%s ", app))
-
-	if port, ok = os.LookupEnv("PORT"); !ok {
-		port = "3000"
-	}
-
-	if addr, ok = os.LookupEnv("ADDR"); !ok {
-		addr = "0.0.0.0"
-	}
-
-	listener = fmt.Sprintf("%s:%s", addr, port)
-
-	if os.Getenv("VERBOSE") != "" {
-		verbose = true
-	}
-
-	tlsCert = os.Getenv("TLS_CERT")
-	tlsKey = os.Getenv("TLS_KEY")
-	if tlsCert != "" && tlsKey != "" {
-		stls = true
-
-		var e error
-		if cert, e = tls.X509KeyPair([]byte(tlsCert), []byte(tlsKey)); e != nil {
-			log.Fatalln(e)
-		}
-
-		// no mtls with tls
-		mtlsCert = os.Getenv("MTLS_CA_CHAIN_CERT")
-		if mtlsCert != "" {
-			mtls = true
-		}
-	}
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -71,21 +32,19 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		logPrefix := fmt.Sprintf("on=http.HandleFunc method=%s path=%s", r.Method, r.URL.Path)
 
 		log.Printf("%s status=%d took=%v\n", logPrefix, status, time.Since(begin))
-		if verbose {
+
+		if cfg.Verbose {
 			log.Printf("%s headers:\n%s", logPrefix, r.Header)
-			//body, err := ioutil.ReadAll(r.Body)
+
 			body := &bytes.Buffer{}
-			_, err := io.Copy(body, r.Body)
-			if err == nil {
+			if _, err := io.Copy(body, r.Body); err == nil {
 				log.Printf("%s body:\n%s", logPrefix, body.String())
 			}
 		}
 	}()
 
-	statusHeader := r.Header.Get("X-HTTP-Status")
-	if statusHeader != "" {
-		i, e := strconv.ParseInt(statusHeader, 10, 16)
-		if e == nil {
+	if h := r.Header.Get("X-HTTP-Status"); h != "" {
+		if i, e := strconv.ParseInt(h, 10, 16); e == nil {
 			status = int(i)
 		} else {
 			status = 500
@@ -96,19 +55,29 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	log.Printf("on=startup addr=%s port=%s mtls=%v ssl=%v\n", addr, port, mtls, stls)
+	cfg = config.Init(os.Args)
+
+	log.SetPrefix(fmt.Sprintf("app=%s ", cfg.App))
+	log.Printf("on=startup %s\n", cfg.ToString())
+
+	var err error
+	if cfg.TLSEnabled() {
+		if cert, err = tls.X509KeyPair([]byte(cfg.CertPrivatePath), []byte(cfg.CertKeyPath)); err != nil {
+			log.Fatalf("error=\"%v\" cert=\"%s\" key=\"%s\"\n", err, cfg.CertPrivatePath, cfg.CertKeyPath)
+		}
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler)
 
-	server := &http.Server{Addr: listener, Handler: mux}
-	if mtls {
+	server := &http.Server{Addr: cfg.Listener(), Handler: mux}
+	if cfg.MTLSEnabled() {
 		addMTLSSupportToServer(server)
 	}
 
-	if !stls {
-		log.Fatal(server.ListenAndServe())
-	} else {
+	if cfg.TLSEnabled() {
 		log.Fatal(listenAndServeTLSKeyPair(server, cert))
+	} else {
+		log.Fatal(server.ListenAndServe())
 	}
 }

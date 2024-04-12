@@ -10,7 +10,7 @@ import (
 
 func addMTLSSupportToServer(server *http.Server) {
 	// Add the cert chain as the intermediate signs both the servers and the clients certificates
-	clientCACert := []byte(mtlsCert)
+	clientCACert := []byte(cfg.CertCAPath)
 
 	clientCertPool := x509.NewCertPool()
 	clientCertPool.AppendCertsFromPEM(clientCACert)
@@ -54,7 +54,7 @@ func listenAndServeTLSKeyPair(server *http.Server, cert tls.Certificate) error {
 	config.Certificates = make([]tls.Certificate, 1)
 	config.Certificates[0] = cert
 
-	ln, err := net.Listen("tcp", listener)
+	ln, err := net.Listen("tcp", cfg.Listener())
 	if err != nil {
 		return err
 	}
