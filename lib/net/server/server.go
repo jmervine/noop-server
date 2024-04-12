@@ -6,13 +6,6 @@ import (
 	"github.com/jmervine/noop-server/lib/config"
 )
 
-// type Server struct {
-// 	cfg *config.Config
-//
-// 	mux *http.ServeMux
-// 	Listener
-// }
-
 var verbose bool
 
 func Start(c *config.Config) error {
