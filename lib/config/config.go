@@ -23,7 +23,7 @@ type Config struct {
 	Verbose bool
 }
 
-func Init(args []string) Config {
+func Init(args []string) *Config {
 	c := Config{}
 
 	helpPrinter := cli.HelpPrinter
@@ -60,7 +60,7 @@ func Init(args []string) Config {
 			Name:        "addr",
 			Aliases:     []string{"a"},
 			Usage:       "Listener address",
-			Value:       "0.0.0.0",
+			Value:       "localhost",
 			EnvVars:     []string{"ADDR"},
 			Required:    false,
 			Destination: &c.Addr,
@@ -105,7 +105,7 @@ func Init(args []string) Config {
 		log.Fatal(err)
 	}
 
-	return c
+	return &c
 }
 
 func (c Config) Listener() string {
