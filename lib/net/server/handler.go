@@ -1,4 +1,4 @@
-package handler
+package server
 
 import (
 	"bytes"
@@ -8,29 +8,19 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/jmervine/noop-server/lib/config"
 )
 
-var cfg *config.Config
-
-func Init(c *config.Config) func(w http.ResponseWriter, r *http.Request) {
-	if cfg == nil {
-		cfg = c
-	}
-
-	return handlerFunc
-}
+const STATUS_HEADER = "X-HTTP-Status"
 
 func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	begin := time.Now()
 	status := http.StatusOK
 
 	defer func() {
-		logPrefix := fmt.Sprintf("on=http.HandleFunc method=%s path=%s", r.Method, r.URL.Path)
+		logPrefix := fmt.Sprintf("on=server.handlerFunc method=%s path=%s", r.Method, r.URL.Path)
 		log.Printf("%s status=%d took=%v\n", logPrefix, status, time.Since(begin))
 
-		if cfg.Verbose {
+		if verbose {
 			log.Printf("%s headers:\n%s", logPrefix, r.Header)
 
 			body := &bytes.Buffer{}
@@ -40,7 +30,7 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	if h := r.Header.Get("X-HTTP-Status"); h != "" {
+	if h := r.Header.Get(STATUS_HEADER); h != "" {
 		if i, e := strconv.ParseInt(h, 10, 16); e == nil {
 			status = int(i)
 		} else {
