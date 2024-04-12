@@ -7,6 +7,13 @@ A simple noop server that accepts everything.
 
 ## run
 
+### local
+
+```
+go install github.com/jmervine/noop-server
+VERBOSE=true PORT=3333 noop-server
+```
+
 ### w/ docker
 
 ```
