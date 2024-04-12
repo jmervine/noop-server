@@ -22,7 +22,7 @@ func addMTLSSupportToServer(server *http.Server) {
 		MinVersion:               tls.VersionTLS12,
 	}
 
-	tlsConfig.BuildNameToCertificate()
+	//tlsConfig.BuildNameToCertificate()
 
 	server.TLSConfig = tlsConfig
 }
