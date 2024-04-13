@@ -6,19 +6,20 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 )
 
-const STATUS_HEADER = "X-HTTP-Status"
+const FLAG_HEADER = "X-NoopServerFlags"
 
 func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	begin := time.Now()
-	status := http.StatusOK
+
+	// unset default should work, or be handled
+	flags := parseHeaderFlags(r.Header.Get(FLAG_HEADER))
 
 	defer func() {
 		logPrefix := fmt.Sprintf("on=server.handlerFunc method=%s path=%s", r.Method, r.URL.Path)
-		log.Printf("%s status=%d took=%v\n", logPrefix, status, time.Since(begin))
+		log.Printf("%s status=%d took=%v\n", logPrefix, flags.Status(), time.Since(begin))
 
 		if verbose {
 			log.Printf("%s headers:\n%s", logPrefix, r.Header)
@@ -30,13 +31,6 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	if h := r.Header.Get(STATUS_HEADER); h != "" {
-		if i, e := strconv.ParseInt(h, 10, 16); e == nil {
-			status = int(i)
-		} else {
-			status = 500
-		}
-	}
-
-	http.Error(w, fmt.Sprintf("%d %s", status, http.StatusText(status)), status)
+	flags.Sleep() // Only sleeps if sleep is set
+	http.Error(w, flags.Echo(r), flags.Status())
 }

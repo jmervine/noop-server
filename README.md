@@ -74,7 +74,7 @@ Date: Fri, 04 Sep 2015 16:56:24 GMT
 Content-Length: 3
 
 200 OK
-jmervine@debian:~$ curl -i -H 'X-HTTP-Status: 500' -X DELETE localhost:3000
+jmervine@debian:~$ curl -i -H 'X-NoopServerFlags:status=500' -X DELETE localhost:3000
 HTTP/1.1 500 Internal Server Error
 Content-Type: text/plain; charset=utf-8
 X-Content-Type-Options: nosniff
@@ -82,7 +82,7 @@ Date: Fri, 04 Sep 2015 16:56:29 GMT
 Content-Length: 22
 
 500 Internal Server Error
-jmervine@debian:~$ curl -i -H 'X-HTTP-Status: 404' -X DELETE localhost:3000/
+jmervine@debian:~$ curl -i -H 'X-NoopServerFlags:status=404' -X DELETE localhost:3000/
 HTTP/1.1 404 Not Found
 Content-Type: text/plain; charset=utf-8
 X-Content-Type-Options: nosniff
