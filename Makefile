@@ -21,6 +21,13 @@ run:
 bin/noop-server:
 	go build -o bin/noop-server ./cmd/noop-server/...
 
+tag:
+ifndef TAG
+		$(error ENV is undefined)
+endif
+	#git tag $(TAG)
+	#docker tag jmervine/noop-server:latest jmervine/noop-server:$(TAG)
+
 .PHONY: clean
 clean:
 	rm -rf bin

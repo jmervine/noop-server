@@ -50,7 +50,7 @@ func TestStatusCode(t *testing.T) {
 		t.Errorf("Expected nil, got: %v", err)
 	}
 
-	req.Header.Add("X-HTTP-Status", "201")
+	req.Header.Add(FLAG_HEADER, "status=201")
 
 	resp, err := client.Do(req)
 	if err != nil {
