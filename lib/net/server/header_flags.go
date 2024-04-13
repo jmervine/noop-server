@@ -11,10 +11,10 @@ import (
 // Parsing header flags takes +/- 20ns, as such, I'm caching the results above
 // so that only new header flags will be parsed.
 //
-// TODO / WARNING
-// This is dangerous, because if someone generates a high volume of
-// random headers, it could grow forever. Consider replacing with a
-// real LRU cache.
+// TODO: Consider replacing with a real LRU cache.
+//
+//	This is dangerous; if someone generates a high volume of random headers,
+//	it could grow forever.
 var headerFlagCache = make(map[string]*headerFlags)
 
 const FLAG_SLEEP_CAP = (15 * time.Second)

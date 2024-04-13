@@ -22,12 +22,16 @@ bin/noop-server:
 	go build -o bin/noop-server ./cmd/noop-server/...
 
 tag:
-ifndef TAG
-		$(error ENV is undefined)
-endif
+	# Tag git and docker with 'TAG=$(TAG)'
+ifdef TAG
 	#git tag $(TAG)
 	#docker tag jmervine/noop-server:latest jmervine/noop-server:$(TAG)
+endif
 
 .PHONY: clean
 clean:
 	rm -rf bin
+
+.PHONY: todos
+todos:
+	@git grep -n TODO | grep -v Makefile | awk -F':' '{ print " - TODO["$$1":"$$2"]:"$$NF }'
