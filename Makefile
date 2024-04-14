@@ -2,7 +2,7 @@ default: test build
 
 .PHONY: test
 test:
-	go test -v -race ./...
+	go test -race ./...
 
 .PHONY: build
 build:

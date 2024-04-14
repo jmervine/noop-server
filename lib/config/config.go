@@ -10,6 +10,7 @@ import (
 )
 
 const DEFAULT_NAME = "noop-server"
+const DEFAULT_RECORD_TARGET = "record.txt"
 
 type Config struct {
 	App  string
@@ -21,6 +22,8 @@ type Config struct {
 	CertCAPath      string
 
 	Verbose bool
+
+	Record bool
 }
 
 func Init(args []string) *Config {
@@ -95,6 +98,13 @@ func Init(args []string) *Config {
 			Required:    false,
 			EnvVars:     []string{"MTLS_CA_CHAIN_PATH"},
 			Destination: &c.CertCAPath,
+		},
+		// TODO: Support record formats: noop-client,csv,json,yaml
+		&cli.BoolFlag{
+			Name:        "record",
+			Usage:       "Record results to a file",
+			Value:       false,
+			Destination: &c.Record,
 		},
 	}
 	app.Action = func(_ *cli.Context) error {
