@@ -5,14 +5,14 @@
 //
 // # Format is '{iterations:-1}|{method:-GET}|{endpoint}|{headers:-}
 // 6|GET|http://localhost:3000/request1|User-Agent:noop-client,X-Test:run1
-package noop_client
+package formatter
 
 import (
 	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/jmervine/noop-server/lib/recorder"
+	"github.com/jmervine/noop-server/lib/records"
 )
 
 const FORMAT_TEMPLATE = "%d|%s|%s|%s"
@@ -20,32 +20,32 @@ const FORMAT_HEADER_TEMPLATE = "%s:%s"
 const FORMAT_HEADER_JOIN = ";"
 
 type NoopClient struct {
-	recorder.RecordFormatter
+	recordsFormatter
 }
 
-func (f *NoopClient) Format(mapped *recorder.RecordMap) string {
+func (f NoopClient) FormatRecordMap(mapped *records.RecordMap) string {
 	collect := []string{}
 	mapped.Range(func(_, r interface{}) bool {
-		collect = append(collect, f.String(r.(*recorder.Record)))
+		collect = append(collect, f.FormatRecord(r.(*records.Record)))
 		return true
 	})
 
 	return strings.Join(collect, "\n")
 }
 
-func (f *NoopClient) String(r *recorder.Record) string {
+func (f NoopClient) FormatRecord(r *records.Record) string {
 	return fmt.Sprintf(
 		FORMAT_TEMPLATE,
 		r.Iterations,
 		r.Method,
 		r.Endpoint,
-		f.FormatHeader(r.Headers),
+		f.FormatHeader(&r.Headers),
 	)
 }
 
-func (f *NoopClient) FormatHeader(headers http.Header) string {
+func (f NoopClient) FormatHeader(headers *http.Header) string {
 	collect := []string{}
-	for key, value := range headers {
+	for key, value := range *headers {
 		values := strings.Join(value, ",")
 		collect = append(collect, fmt.Sprintf(FORMAT_HEADER_TEMPLATE, key, values))
 	}

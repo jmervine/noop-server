@@ -1,4 +1,4 @@
-package recorder
+package records
 
 import (
 	"crypto/sha256"

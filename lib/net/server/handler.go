@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jmervine/noop-server/lib/recorder"
+	"github.com/jmervine/noop-server/lib/records"
 )
 
 const FLAG_HEADER = "X-NoopServerFlags"
@@ -16,7 +16,7 @@ const FLAG_HEADER = "X-NoopServerFlags"
 func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	begin := time.Now()
 
-	record := recorder.NewRecord(r, record)
+	record := records.NewRecord(r, record)
 
 	defer func() {
 		logPrefix := fmt.Sprintf("on=server.handlerFunc method=%s path=%s", r.Method, r.URL.Path)
