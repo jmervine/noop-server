@@ -26,7 +26,7 @@ make bin/noop-server
 ### local
 
 ```
-go install github.com/jmervine/noop-server
+go install github.com/jmervine/noop-server/cmd/noop-server@latest
 VERBOSE=true PORT=3333 noop-server
 
 # OR
