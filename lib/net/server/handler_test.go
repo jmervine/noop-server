@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/jmervine/noop-server/lib/recorder"
 )
 
 func TestGet(t *testing.T) {
@@ -50,7 +52,7 @@ func TestStatusCode(t *testing.T) {
 		t.Errorf("Expected nil, got: %v", err)
 	}
 
-	req.Header.Add(FLAG_HEADER, "status=201")
+	req.Header.Add(recorder.RECORD_HEADER, "status:201")
 
 	resp, err := client.Do(req)
 	if err != nil {

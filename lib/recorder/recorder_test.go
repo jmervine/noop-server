@@ -28,27 +28,27 @@ func TestRecordMap_Add(t *testing.T) {
 
 	m.Add(r)
 
-	if len(m) != 1 {
+	if m.size() != 1 {
 		t.Error("Expected item to be added to RecordMap")
 	}
 
-	i := m[r.Hash()].Iterations
-	if i != 1 {
-		t.Error("Expected Iterations=1, was", i)
+	rec, _ := m.Get(r.hash())
+	if rec.Iterations != 1 {
+		t.Error("Expected Iterations=1, was", rec.Iterations)
 	}
 
 	m.Add(r)
 
-	i = m[r.Hash()].Iterations
-	if i != 2 {
-		t.Error("Expected Iterations=2, was", i)
+	rec, _ = m.Get(r.hash())
+	if rec.Iterations != 2 {
+		t.Error("Expected Iterations=2, was", rec.Iterations)
 	}
 }
 
 func TestRecord_parseStatus(t *testing.T) {
 	r := Record{}
-	r.parseStatus("301")
-	if uint16(301) != r.Status {
+	r.parseStatus("308")
+	if r.Status != http.StatusPermanentRedirect {
 		t.Error("Expected status to be parsed and inserted correctly")
 	}
 
@@ -104,16 +104,16 @@ func TestRecord_parseSleep(t *testing.T) {
 	}
 }
 
-func TestRecord_Hash(t *testing.T) {
+func TestRecord_hash(t *testing.T) {
 	r1 := Record{Status: 200, Endpoint: "http://localhost/foo1"}
 	r2 := Record{Status: 200, Endpoint: "http://localhost/foo1"}
 	r3 := Record{Status: 300, Endpoint: "http://localhost/foo1"}
 
-	if r1.Hash() != r2.Hash() {
+	if r1.hash() != r2.hash() {
 		t.Error("Expected r1 and r1 to have the same hash")
 	}
 
-	if r1.Hash() == r3.Hash() {
+	if r1.hash() == r3.hash() {
 		t.Error("Expected r1 and r3 to have difference hashes")
 	}
 }

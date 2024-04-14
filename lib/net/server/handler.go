@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/jmervine/noop-server/lib/recorder"
 )
 
 const FLAG_HEADER = "X-NoopServerFlags"
@@ -15,11 +17,12 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	begin := time.Now()
 
 	// unset default should work, or be handled
-	flags := parseHeaderFlags(r.Header.Get(FLAG_HEADER))
+	//flags := parseHeaderFlags(r.Header.Get(FLAG_HEADER))
+	record := recorder.NewRecord(r)
 
 	defer func() {
 		logPrefix := fmt.Sprintf("on=server.handlerFunc method=%s path=%s", r.Method, r.URL.Path)
-		log.Printf("%s status=%d took=%v\n", logPrefix, flags.Status(), time.Since(begin))
+		log.Printf("%s status=%d took=%v\n", logPrefix, record.Status, time.Since(begin))
 
 		if verbose {
 			log.Printf("%s headers:\n%s", logPrefix, r.Header)
@@ -31,6 +34,8 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	flags.Sleep() // Only sleeps if sleep is set
-	http.Error(w, flags.Echo(r), flags.Status())
+	record.DoSleep() // Only sleeps if sleep is set
+
+	body := record.EchoString()
+	http.Error(w, body, record.Status)
 }
