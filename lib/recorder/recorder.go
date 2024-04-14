@@ -27,6 +27,12 @@ const RECORD_HASH_STRING = "status=%d|method=%s|endpoint=%s|header=%#v|sleep=%v|
 
 var records = RecordMap{}
 
+type RecordFormatter interface {
+	Format(*RecordMap) string
+	String(*Record) string
+	FormatHeader(*http.Header) string
+}
+
 type RecordMap struct {
 	sync.Map
 }
@@ -74,9 +80,11 @@ type Record struct {
 	Echo bool
 }
 
-func NewRecord(req *http.Request) Record {
+func NewRecord(req *http.Request, store bool) Record {
 	r := Record{}
-	defer records.Add(r)
+	if store {
+		defer records.Add(r)
+	}
 
 	// Because this will parse a single request, the iterations will always be 1
 	// this field exists to be a counter as they're added to Records.

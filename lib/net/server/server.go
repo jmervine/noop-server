@@ -7,9 +7,11 @@ import (
 )
 
 var verbose bool
+var record bool
 
 func Start(c *config.Config) error {
 	verbose = c.Verbose
+	record = c.Record
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlerFunc)

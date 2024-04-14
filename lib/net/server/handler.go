@@ -16,9 +16,7 @@ const FLAG_HEADER = "X-NoopServerFlags"
 func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	begin := time.Now()
 
-	// unset default should work, or be handled
-	//flags := parseHeaderFlags(r.Header.Get(FLAG_HEADER))
-	record := recorder.NewRecord(r)
+	record := recorder.NewRecord(r, record)
 
 	defer func() {
 		logPrefix := fmt.Sprintf("on=server.handlerFunc method=%s path=%s", r.Method, r.URL.Path)
