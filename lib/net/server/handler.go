@@ -1,13 +1,11 @@
 package server
 
 import (
-	"bytes"
-	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/jmervine/noop-server/lib/recorder"
 	"github.com/jmervine/noop-server/lib/records"
 	"github.com/jmervine/noop-server/lib/records/formatter"
 )
@@ -26,22 +24,19 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 		format = &formatter.Default{}
 	}
 
+	out := recorder.StdRecorder{}
+	out.SetFormatter(format)
+	out.SetWriter(w)
+
+	w.WriteHeader(record.Status)
+
 	defer func() {
-		logPrefix := fmt.Sprintf("on=server.handlerFunc method=%s path=%s", r.Method, r.URL.Path)
-		log.Printf("%s status=%d took=%v\n", logPrefix, record.Status, time.Since(begin))
+		defer r.Body.Close()
 
-		if verbose {
-			log.Printf("%s headers:\n%s", logPrefix, r.Header)
-
-			body := &bytes.Buffer{}
-			if _, err := io.Copy(body, r.Body); err == nil {
-				log.Printf("%s body:\n%s", logPrefix, body.String())
-			}
-		}
+		f := formatter.NewLogFormatter("server.handlerFunc", time.Since(begin), r.Body, verbose)
+		log.Printf(f.FormatRecord(record))
 	}()
 
 	record.DoSleep() // Only sleeps if sleep is set
-
-	body := format.FormatRecord(record)
-	http.Error(w, body, record.Status)
+	out.WriteOne(record)
 }

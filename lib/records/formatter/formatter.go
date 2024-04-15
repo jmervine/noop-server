@@ -6,6 +6,7 @@ package formatter
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/jmervine/noop-server/lib/records"
@@ -73,4 +74,12 @@ func commonFormatHeader(headers *http.Header) string {
 	}
 
 	return strings.Join(collect, DEFAULT_HEADER_JOIN)
+}
+
+func commonPath(s string) string {
+	parsed, err := url.Parse(s)
+	if err == nil {
+		return parsed.Path
+	}
+	return ""
 }

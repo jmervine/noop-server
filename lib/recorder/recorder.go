@@ -3,7 +3,6 @@ package recorder
 // Records (REH-kawrds) a record (REH-kuhrd) somewhere.
 
 import (
-	"bytes"
 	"io"
 
 	"github.com/jmervine/noop-server/lib/records"
@@ -17,6 +16,7 @@ type Recorder interface {
 	WriteAll(*records.RecordMap) error
 }
 
+// This will support anything that implements the 'io.Writer' interface.
 type StdRecorder struct {
 	formatter formatter.RecordsFormatter
 	writer    io.Writer
@@ -26,7 +26,7 @@ func (r *StdRecorder) SetFormatter(f formatter.RecordsFormatter) {
 	r.formatter = f
 }
 
-func (r *StdRecorder) SetWriter(h *bytes.Buffer) {
+func (r *StdRecorder) SetWriter(h io.Writer) {
 	r.writer = h
 }
 

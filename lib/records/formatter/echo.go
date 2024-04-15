@@ -5,7 +5,6 @@ package formatter
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/jmervine/noop-server/lib/records"
 )
@@ -19,11 +18,7 @@ func (f *Echo) FormatRecordMap(mapped *records.RecordMap) string {
 }
 
 func (f *Echo) FormatRecord(r records.Record) string {
-	var path string
-	parsed, err := url.Parse(r.Endpoint)
-	if err == nil {
-		path = parsed.Path
-	}
+	path := commonPath(r.Endpoint)
 
 	return fmt.Sprintf(
 		ECHO_TEMPLATE,
