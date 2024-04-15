@@ -20,11 +20,12 @@ func recordMap() *records.RecordMap {
 }
 
 func record() records.Record {
+	h := headers(true)
 	return records.Record{
 		Iterations: 1,
 		Status:     http.StatusOK,
 		Sleep:      0,
-		Headers:    headers(true),
+		Headers:    &h,
 		Endpoint:   "http://localhost/testing",
 		Method:     "GET",
 	}

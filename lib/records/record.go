@@ -26,7 +26,7 @@ const RECORD_HASH_STRING = "status=%d|method=%s|endpoint=%s|header=%#v|sleep=%v|
 
 type Record struct {
 	Iterations int
-	Headers    http.Header
+	Headers    *http.Header
 	Endpoint   string
 	Method     string
 
@@ -55,7 +55,7 @@ func NewRecord(req *http.Request, store bool) Record {
 	// Values from http.Request
 	r.Endpoint = req.URL.Path
 	r.Method = req.Method
-	r.Headers = req.Header
+	r.Headers = &req.Header
 
 	// Values from http.Header
 	r.parseValuesFromHeader()
@@ -76,21 +76,9 @@ func (r *Record) DoSleep() {
 	time.Sleep(dur)
 }
 
-func (r *Record) EchoString() string {
-	s := fmt.Sprintf("%d %s", r.Status, http.StatusText(r.Status))
-	if r.Echo {
-		s = fmt.Sprintf(
-			"status='%s' method=%s path=%s headers='%v'",
-			s, r.Method, r.Endpoint, r.Headers,
-		)
-	}
-
-	return s
-}
-
 func (r *Record) parseValuesFromHeader() {
 	if r.Headers == nil {
-		r.Headers = http.Header{}
+		r.Headers = &http.Header{}
 		return
 	}
 

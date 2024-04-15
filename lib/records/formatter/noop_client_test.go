@@ -12,7 +12,7 @@ func NoopClient_FormatRecordMap(t *testing.T) {
 func NoopClient_FormatRecord(t *testing.T) {
 	f := NoopClient{}
 	rec := record()
-	r := f.FormatRecord(&rec)
+	r := f.FormatRecord(rec)
 	e := fmt.Sprintf(NOOP_CLEINT_TEMPLATE, 1, "GET", "http://localhost/testing", "Foo:bar")
 
 	if r != e {

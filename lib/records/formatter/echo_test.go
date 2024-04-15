@@ -22,7 +22,7 @@ func Echo_FormatRecordMap(t *testing.T) {
 func Echo_FormatRecord(t *testing.T) {
 	f := Echo{}
 	rec := record()
-	r := f.FormatRecord(&rec)
+	r := f.FormatRecord(rec)
 	e := fmt.Sprintf(ECHO_TEMPLATE, 200, "OK", "GET", "/testing", "Foo:bar")
 
 	if r != e {

@@ -21,9 +21,9 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 
 	var format formatter.RecordsFormatter
 	if record.Echo {
-		format = formatter.Echo{}
+		format = &formatter.Echo{}
 	} else {
-		format = formatter.Default{}
+		format = &formatter.Default{}
 	}
 
 	defer func() {
@@ -42,6 +42,6 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 
 	record.DoSleep() // Only sleeps if sleep is set
 
-	body := format.FormatRecord(&record)
+	body := format.FormatRecord(record)
 	http.Error(w, body, record.Status)
 }

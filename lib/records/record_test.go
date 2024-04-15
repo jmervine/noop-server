@@ -11,7 +11,7 @@ func emptyRecord() Record {
 		Iterations: 1,
 		Status:     DEFAULT_STATUS,
 		Sleep:      0,
-		Headers:    http.Header{},
+		Headers:    &http.Header{},
 	}
 }
 
