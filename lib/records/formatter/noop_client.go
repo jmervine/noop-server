@@ -1,4 +1,4 @@
-// # formater/noop_client
+// # formatter/noop_client
 //
 // See https://github.com/jmervine/noop-client
 // - Specifically examples/*.txt
@@ -10,32 +10,21 @@ package formatter
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/jmervine/noop-server/lib/records"
 )
 
-const FORMAT_TEMPLATE = "%d|%s|%s|%s"
-const FORMAT_HEADER_TEMPLATE = "%s:%s"
-const FORMAT_HEADER_JOIN = ";"
+const NOOP_CLEINT_TEMPLATE = "%d|%s|%s|%s"
 
-type NoopClient struct {
-	recordsFormatter
-}
+type NoopClient struct{}
 
 func (f NoopClient) FormatRecordMap(mapped *records.RecordMap) string {
-	collect := []string{}
-	mapped.Range(func(_, r interface{}) bool {
-		collect = append(collect, f.FormatRecord(r.(*records.Record)))
-		return true
-	})
-
-	return strings.Join(collect, "\n")
+	return commonFormatRecordMap(f, mapped)
 }
 
 func (f NoopClient) FormatRecord(r *records.Record) string {
 	return fmt.Sprintf(
-		FORMAT_TEMPLATE,
+		NOOP_CLEINT_TEMPLATE,
 		r.Iterations,
 		r.Method,
 		r.Endpoint,
@@ -44,11 +33,5 @@ func (f NoopClient) FormatRecord(r *records.Record) string {
 }
 
 func (f NoopClient) FormatHeader(headers *http.Header) string {
-	collect := []string{}
-	for key, value := range *headers {
-		values := strings.Join(value, ",")
-		collect = append(collect, fmt.Sprintf(FORMAT_HEADER_TEMPLATE, key, values))
-	}
-
-	return strings.Join(collect, FORMAT_HEADER_JOIN)
+	return commonFormatHeader(headers)
 }
