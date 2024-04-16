@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -11,6 +12,7 @@ import (
 
 const DEFAULT_NAME = "noop-server"
 const DEFAULT_RECORD_TARGET = "record.txt"
+const DEFAULT_RECORD_TARGET_APPEND = ".bak"
 
 type Config struct {
 	App  string
@@ -23,7 +25,8 @@ type Config struct {
 
 	Verbose bool
 
-	Record bool
+	Record       bool
+	RecordTarget string
 }
 
 func Init(args []string) *Config {
@@ -102,9 +105,17 @@ func Init(args []string) *Config {
 		// TODO: Support record formats: noop-client,csv,json,yaml
 		&cli.BoolFlag{
 			Name:        "record",
+			Aliases:     []string{"r"},
 			Usage:       "Record results to a file",
 			Value:       false,
 			Destination: &c.Record,
+		},
+		&cli.StringFlag{
+			Name:        "record-target",
+			Aliases:     []string{"t"},
+			Usage:       "Record results to a file",
+			Value:       DEFAULT_RECORD_TARGET,
+			Destination: &c.RecordTarget,
 		},
 	}
 	app.Action = func(_ *cli.Context) error {
@@ -134,4 +145,81 @@ func (c Config) ToString() string {
 	return fmt.Sprintf(
 		"addr=%s port=%s mtls=%v ssl=%v verbose=%v",
 		c.Addr, c.Port, c.MTLSEnabled(), c.TLSEnabled(), c.Verbose)
+}
+
+// Create RecordTarget file, if Record is configured. If it already
+// exists, back up the old one.
+//
+// This returned 'os.File' must be closed when you're done with it.
+func (c Config) RecordFile() (*os.File, error) {
+	if !c.Record {
+		return nil, nil
+	}
+
+	// Workflow
+	// 1. Does file exist
+	// 2. IF YES, backup and create
+	// 3. IF NO, create
+	var err error
+
+	// Check to see if the file exists
+	_, err = os.Stat(c.RecordTarget)
+	if err == nil {
+		// The file exists, so back it up.
+		bak := c.RecordTarget + DEFAULT_RECORD_TARGET_APPEND
+		err = createBackup(c.RecordTarget, bak)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// Return errors that aren't existance check errors
+		if !errors.Is(err, os.ErrNotExist) {
+			return nil, err
+		}
+	}
+
+	// Assume the file doesn't exist and create and return it.
+	return os.Create(c.RecordTarget)
+}
+
+// REF: https://stackoverflow.com/a/62179184
+// This moves the file, removing the original file.
+func createBackup(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return fmt.Errorf("couldn't open source file: %s", err)
+	}
+
+	out, err := os.Create(dst)
+	if err != nil {
+		in.Close()
+		return fmt.Errorf("couldn't open dest file: %s", err)
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	in.Close()
+	if err != nil {
+		return fmt.Errorf("writing to output file failed: %s", err)
+	}
+
+	err = out.Sync()
+	if err != nil {
+		return fmt.Errorf("sync error: %s", err)
+	}
+
+	si, err := os.Stat(src)
+	if err != nil {
+		return fmt.Errorf("stat error: %s", err)
+	}
+	err = os.Chmod(dst, si.Mode())
+	if err != nil {
+		return fmt.Errorf("chmod error: %s", err)
+	}
+
+	err = os.Remove(src)
+	if err != nil {
+		return fmt.Errorf("failed removing original file: %s", err)
+	}
+	return nil
 }
