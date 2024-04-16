@@ -2,7 +2,7 @@ package records
 
 import "sync"
 
-var records = RecordMap{}
+var records = &RecordMap{}
 
 type RecordMap struct {
 	sync.Map

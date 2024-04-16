@@ -17,15 +17,13 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 
 	record := records.NewRecord(r, record)
 
-	var format formatter.RecordsFormatter
+	f := format
 	if record.Echo {
-		format = &formatter.Echo{}
-	} else {
-		format = &formatter.Default{}
+		f = new(formatter.Echo)
 	}
 
 	out := recorder.StdRecorder{}
-	out.SetFormatter(format)
+	out.SetFormatter(f)
 	out.SetWriter(w)
 
 	w.WriteHeader(record.Status)
@@ -34,7 +32,7 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
 		f := formatter.NewLogFormatter("server.handlerFunc", time.Since(begin), r.Body, verbose)
-		log.Printf(f.FormatRecord(record))
+		log.Printf("%s", f.FormatRecord(&record))
 	}()
 
 	record.DoSleep() // Only sleeps if sleep is set

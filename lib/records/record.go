@@ -38,9 +38,14 @@ type Record struct {
 	Echo bool
 }
 
+func GetStore() *RecordMap {
+	return records
+}
+
 func NewRecord(req *http.Request, store bool) Record {
 	r := Record{}
 	if store {
+		fmt.Printf("Adding: %+v\n", r)
 		defer records.Add(r)
 	}
 

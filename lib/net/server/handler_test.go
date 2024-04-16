@@ -14,6 +14,7 @@ func TestGet(t *testing.T) {
 	resp, err := http.Get(server.URL)
 	if err != nil {
 		t.Errorf("Expected nil, got: %v", err)
+		return // avoid panic when resp is nil
 	}
 
 	if resp.StatusCode != 200 {
@@ -31,6 +32,7 @@ func TestPost(t *testing.T) {
 	resp, err := http.Post(server.URL, "text/html", nil)
 	if err != nil {
 		t.Errorf("Expected nil, got: %v", err)
+		return // avoid panic when resp is nil
 	}
 
 	if resp.StatusCode != 200 {
@@ -57,6 +59,7 @@ func TestStatusCode(t *testing.T) {
 	resp, err := client.Do(req)
 	if err != nil {
 		t.Errorf("Expected nil, got: %v", err)
+		return // avoid panic when resp is nil
 	}
 
 	if resp.StatusCode != 201 {

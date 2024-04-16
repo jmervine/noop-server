@@ -10,11 +10,11 @@ import (
 	"github.com/jmervine/noop-server/lib/records/formatter"
 )
 
-func record() records.Record {
+func record() *records.Record {
 	header := &http.Header{}
 	header.Add("foo", "bar")
 
-	return records.Record{
+	return &records.Record{
 		Iterations: 1,
 		Headers:    header,
 		Endpoint:   "http://localhost/testing",
@@ -34,7 +34,7 @@ func TestStdRecord(t *testing.T) {
 
 	r.SetFormatter(f)
 	r.SetWriter(&buf)
-	r.WriteOne(rec)
+	r.WriteOne(*rec)
 
 	result := buf.String()
 	expect := fmt.Sprintf(

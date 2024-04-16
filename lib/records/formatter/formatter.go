@@ -17,7 +17,7 @@ const DEFAULT_HEADER_JOIN = ";"
 
 type RecordsFormatter interface {
 	FormatRecordMap(*records.RecordMap) string
-	FormatRecord(records.Record) string
+	FormatRecord(*records.Record) string
 	FormatHeader(*http.Header) string
 }
 
@@ -43,7 +43,7 @@ func (f *Default) FormatRecordMap(mapped *records.RecordMap) string {
 	return commonFormatRecordMap(f, mapped)
 }
 
-func (f *Default) FormatRecord(r records.Record) string {
+func (f *Default) FormatRecord(r *records.Record) string {
 	return fmt.Sprintf("%d %s", r.Status, http.StatusText(r.Status))
 }
 
@@ -59,7 +59,7 @@ func (f *Default) FormatHeader(headers *http.Header) string {
 func commonFormatRecordMap(f RecordsFormatter, mapped *records.RecordMap) string {
 	collect := []string{}
 	mapped.Range(func(_, r interface{}) bool {
-		collect = append(collect, f.FormatRecord(r.(records.Record)))
+		collect = append(collect, f.FormatRecord(r.(*records.Record)))
 		return true
 	})
 

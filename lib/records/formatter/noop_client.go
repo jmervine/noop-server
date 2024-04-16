@@ -22,7 +22,7 @@ func (f NoopClient) FormatRecordMap(mapped *records.RecordMap) string {
 	return commonFormatRecordMap(f, mapped)
 }
 
-func (f NoopClient) FormatRecord(r records.Record) string {
+func (f NoopClient) FormatRecord(r *records.Record) string {
 	return fmt.Sprintf(
 		NOOP_CLEINT_TEMPLATE,
 		r.Iterations,

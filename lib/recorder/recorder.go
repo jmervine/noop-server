@@ -12,7 +12,7 @@ import (
 type Recorder interface {
 	SetFormatter(formatter.RecordsFormatter)
 	SetWriter(*io.Writer)
-	WriteOne(records.Record) error
+	WriteOne(*records.Record) error
 	WriteAll(*records.RecordMap) error
 }
 
@@ -31,7 +31,7 @@ func (r *StdRecorder) SetWriter(h io.Writer) {
 }
 
 func (r *StdRecorder) WriteOne(rec records.Record) error {
-	str := r.formatter.FormatRecord(rec)
+	str := r.formatter.FormatRecord(&rec)
 	if _, err := r.writer.Write([]byte(str)); err != nil {
 		return err
 	}
