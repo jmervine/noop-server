@@ -23,7 +23,7 @@ func (rm *RecordMap) Add(rec Record) {
 		// TODO: Figure out how to store points in RecordMap
 		// - Ideally, we'd store pointers and modify in place, but I was having
 		// - issues getting that working.
-		rm.Store(hash, found)
+		rm.CompareAndSwap(hash, mapped, found)
 	}
 
 }

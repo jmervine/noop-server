@@ -65,6 +65,7 @@ func commonFormatRecordMap(f RecordsFormatter, mapped *records.RecordMap) string
 	mapped.Range(func(_, r interface{}) bool {
 		// Dereference and then rereference
 		record := r.(records.Record)
+		fmt.Printf("record in map:: %#v\n", record)
 
 		log.Printf("collected: %+v\n", record)
 
