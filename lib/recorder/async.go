@@ -22,7 +22,7 @@ func (r *AsyncRecorder) WriteOne(rec records.Record) error {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
-	str := r.formatter.FormatRecord(&rec)
+	str := r.formatter.FormatRecord(rec)
 	if _, err := r.writer.Write([]byte(str)); err != nil {
 		return err
 	}

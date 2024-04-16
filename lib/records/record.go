@@ -45,7 +45,6 @@ func GetStore() *RecordMap {
 func NewRecord(req *http.Request, store bool) Record {
 	r := Record{}
 	if store {
-		fmt.Printf("Adding: %+v\n", r)
 		defer records.Add(r)
 	}
 

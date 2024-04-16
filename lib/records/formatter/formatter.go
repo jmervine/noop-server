@@ -5,6 +5,7 @@ package formatter
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -15,9 +16,12 @@ import (
 const DEFAULT_HEADER_TEMPLATE = "%s:%s"
 const DEFAULT_HEADER_JOIN = ";"
 
+// RecordFormatter interface
+//   - RecordMap needs to be passed as a pointer to ensure thread
+//     safety.
 type RecordsFormatter interface {
 	FormatRecordMap(*records.RecordMap) string
-	FormatRecord(*records.Record) string
+	FormatRecord(records.Record) string
 	FormatHeader(*http.Header) string
 }
 
@@ -27,11 +31,11 @@ func NewFromString(formatter string) RecordsFormatter {
 	switch formatter {
 	case "noop_client":
 	case "noopclient":
-		rf = &NoopClient{}
+		rf = NoopClient{}
 	case "echo":
-		rf = &Echo{}
+		rf = Echo{}
 	default:
-		rf = &Default{}
+		rf = Default{}
 	}
 
 	return rf
@@ -39,15 +43,15 @@ func NewFromString(formatter string) RecordsFormatter {
 
 type Default struct{}
 
-func (f *Default) FormatRecordMap(mapped *records.RecordMap) string {
+func (f Default) FormatRecordMap(mapped *records.RecordMap) string {
 	return commonFormatRecordMap(f, mapped)
 }
 
-func (f *Default) FormatRecord(r *records.Record) string {
+func (f Default) FormatRecord(r records.Record) string {
 	return fmt.Sprintf("%d %s", r.Status, http.StatusText(r.Status))
 }
 
-func (f *Default) FormatHeader(headers *http.Header) string {
+func (f Default) FormatHeader(headers *http.Header) string {
 	if headers == nil {
 		return ""
 	}
@@ -59,7 +63,12 @@ func (f *Default) FormatHeader(headers *http.Header) string {
 func commonFormatRecordMap(f RecordsFormatter, mapped *records.RecordMap) string {
 	collect := []string{}
 	mapped.Range(func(_, r interface{}) bool {
-		collect = append(collect, f.FormatRecord(r.(*records.Record)))
+		// Dereference and then rereference
+		record := r.(records.Record)
+
+		log.Printf("collected: %+v\n", record)
+
+		collect = append(collect, f.FormatRecord(record))
 		return true
 	})
 

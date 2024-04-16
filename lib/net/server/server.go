@@ -1,7 +1,7 @@
 package server
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -29,24 +29,33 @@ func Start(c *config.Config) error {
 		addMTLSSupportToServer(svr, c.CertCAPath)
 	}
 
+	// TODO: Consider remove all recorder handling in net/server to recorder.
 	if record {
 		sigChan := make(chan os.Signal, 1)
 		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGHUP)
 		go func() {
-			<-sigChan
+			// As currently designed SIGHUP will record only, without stopping the
+			// server. SIGINT will record and exit.
+			sig := <-sigChan
 
 			r := recorder.SerialRecorder{}
 
-			file, err := os.Create("record.txt")
+			file, err := c.RecordFile()
 			if err != nil {
-				fmt.Printf("Error creating record.txt: %v\n", err)
-				return
+				log.Fatalf("Error creating '%s' with %v\n", c.RecordTarget, err)
 			}
 			defer file.Close()
 
-			r.SetFormatter(format)
+			r.SetFormatter(formatter.NoopClient{})
 			r.SetWriter(file)
-			r.WriteAll(records.GetStore())
+
+			store := records.GetStore()
+			log.Printf("on=server.Start record-target='%s' record-count=%d\n", c.RecordTarget, store.Size())
+			r.WriteAll(store)
+
+			if sig == syscall.SIGINT {
+				os.Exit(0)
+			}
 		}()
 	}
 

@@ -13,11 +13,11 @@ const ECHO_TEMPLATE = "status='%d %s' method=%s path=%s headers='%v'"
 
 type Echo struct{}
 
-func (f *Echo) FormatRecordMap(mapped *records.RecordMap) string {
+func (f Echo) FormatRecordMap(mapped *records.RecordMap) string {
 	return commonFormatRecordMap(f, mapped)
 }
 
-func (f *Echo) FormatRecord(r *records.Record) string {
+func (f Echo) FormatRecord(r records.Record) string {
 	path := commonPath(r.Endpoint)
 
 	return fmt.Sprintf(
@@ -30,7 +30,7 @@ func (f *Echo) FormatRecord(r *records.Record) string {
 	)
 }
 
-func (f *Echo) FormatHeader(headers *http.Header) string {
+func (f Echo) FormatHeader(headers *http.Header) string {
 	if headers == nil {
 		return ""
 	}

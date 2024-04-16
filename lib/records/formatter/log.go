@@ -28,11 +28,11 @@ func NewLogFormatter(fn string, dur time.Duration, body io.ReadCloser, v bool) L
 	}
 }
 
-func (f *Log) FormatRecordMap(mapped *records.RecordMap) string {
+func (f Log) FormatRecordMap(mapped *records.RecordMap) string {
 	return commonFormatRecordMap(f, mapped)
 }
 
-func (f *Log) FormatRecord(r *records.Record) string {
+func (f Log) FormatRecord(r records.Record) string {
 	path := commonPath(r.Endpoint)
 
 	str := fmt.Sprintf(LOG_TEMPLATE, f.caller, r.Method, path, r.Status, f.duration)
@@ -53,6 +53,6 @@ func (f *Log) FormatRecord(r *records.Record) string {
 	return str
 }
 
-func (f *Log) FormatHeader(h *http.Header) string {
+func (f Log) FormatHeader(h *http.Header) string {
 	return commonFormatHeader(h)
 }

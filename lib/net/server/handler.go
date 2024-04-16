@@ -16,6 +16,8 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	begin := time.Now()
 
 	record := records.NewRecord(r, record)
+	log.Printf("Creating: %+v\n", record)
+	log.Printf("From: %+v\n", r)
 
 	f := format
 	if record.Echo {
@@ -32,7 +34,7 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
 		f := formatter.NewLogFormatter("server.handlerFunc", time.Since(begin), r.Body, verbose)
-		log.Printf("%s", f.FormatRecord(&record))
+		log.Printf("%s", f.FormatRecord(record))
 	}()
 
 	record.DoSleep() // Only sleeps if sleep is set

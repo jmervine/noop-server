@@ -142,9 +142,15 @@ func (c Config) MTLSEnabled() bool {
 }
 
 func (c Config) ToString() string {
-	return fmt.Sprintf(
-		"addr=%s port=%s mtls=%v ssl=%v verbose=%v",
-		c.Addr, c.Port, c.MTLSEnabled(), c.TLSEnabled(), c.Verbose)
+	out := fmt.Sprintf(
+		"addr=%s port=%s mtls=%v ssl=%v verbose=%v record=%v",
+		c.Addr, c.Port, c.MTLSEnabled(), c.TLSEnabled(), c.Verbose, c.Record)
+
+	if c.Record {
+		out += fmt.Sprintf(" record-target='%s'", c.RecordTarget)
+	}
+
+	return out
 }
 
 // Create RecordTarget file, if Record is configured. If it already
