@@ -27,7 +27,7 @@ func record() records.Record {
 		Status:     http.StatusOK,
 		Sleep:      0,
 		Headers:    &h,
-		Endpoint:   "http://localhost/testing",
+		Endpoint:   "/testing",
 		Method:     "GET",
 	}
 }

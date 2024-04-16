@@ -2,24 +2,28 @@
 //
 // See https://github.com/jmervine/noop-client
 // - Specifically examples/*.txt
-//
-// # Format is '{iterations:-1}|{method:-GET}|{endpoint}|{headers:-}
-// 6|GET|http://localhost:3000/request1|User-Agent:noop-client,X-Test:run1
 package formatter
 
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/jmervine/noop-server/lib/records"
 )
 
-const NOOP_CLEINT_TEMPLATE = "%d|%s|%s|%s"
+// # Format is '{iterations:-1}|{method:-GET}|{endpoint}|{headers:-}|{sleep}
+// TODO: NoopClient needs a host somehow
+const NOOP_CLEINT_TEMPLATE = "%d|%s|%s|%s|%v"
 
 type NoopClient struct{}
 
 func (f NoopClient) FormatRecordMap(mapped *records.RecordMap) string {
-	return commonFormatRecordMap(f, mapped)
+	return fmt.Sprintf(
+		"# Created: %s\n%s\n",
+		time.Now().Format("Mon Jan 2 15:04:05 MST 2006"),
+		commonFormatRecordMap(f, mapped),
+	)
 }
 
 func (f NoopClient) FormatRecord(r records.Record) string {
@@ -29,6 +33,7 @@ func (f NoopClient) FormatRecord(r records.Record) string {
 		r.Method,
 		r.Endpoint,
 		f.FormatHeader(r.Headers),
+		r.Sleep,
 	)
 }
 

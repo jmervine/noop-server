@@ -77,7 +77,7 @@ func commonFormatHeader(headers *http.Header) string {
 		collect = append(collect, fmt.Sprintf(DEFAULT_HEADER_TEMPLATE, key, values))
 	}
 
-	return strings.Join(collect, DEFAULT_HEADER_JOIN) + "\n"
+	return strings.Join(collect, DEFAULT_HEADER_JOIN)
 }
 
 func commonPath(s string) string {
