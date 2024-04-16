@@ -5,7 +5,6 @@ package formatter
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -61,17 +60,12 @@ func (f Default) FormatHeader(headers *http.Header) string {
 
 // Common - reuse in more than one
 func commonFormatRecordMap(f RecordsFormatter, mapped *records.RecordMap) string {
-	collect := []string{}
-	mapped.Range(func(_, r interface{}) bool {
-		// Dereference and then rereference
-		record := r.(records.Record)
-		fmt.Printf("record in map:: %#v\n", record)
+	records := mapped.Snapshot()
+	collect := make([]string, 0, len(records))
 
-		log.Printf("collected: %+v\n", record)
-
+	for _, record := range mapped.Snapshot() {
 		collect = append(collect, f.FormatRecord(record))
-		return true
-	})
+	}
 
 	return strings.Join(collect, "\n")
 }
@@ -83,7 +77,7 @@ func commonFormatHeader(headers *http.Header) string {
 		collect = append(collect, fmt.Sprintf(DEFAULT_HEADER_TEMPLATE, key, values))
 	}
 
-	return strings.Join(collect, DEFAULT_HEADER_JOIN)
+	return strings.Join(collect, DEFAULT_HEADER_JOIN) + "\n"
 }
 
 func commonPath(s string) string {

@@ -106,7 +106,7 @@ func Init(args []string) *Config {
 		&cli.BoolFlag{
 			Name:        "record",
 			Aliases:     []string{"r"},
-			Usage:       "Record results to a file",
+			Usage:       "Record results to a file (adds notable overhead [+/- 25us])",
 			Value:       false,
 			Destination: &c.Record,
 		},

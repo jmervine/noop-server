@@ -39,14 +39,11 @@ type Record struct {
 }
 
 func GetStore() *RecordMap {
-	return records
+	return defaultStore
 }
 
-func NewRecord(req *http.Request, store bool) Record {
+func NewRecord(req *http.Request, store *RecordMap) Record {
 	r := Record{}
-	if store {
-		defer records.Add(r)
-	}
 
 	// Because this will parse a single request, the iterations will always be 1
 	// this field exists to be a counter as they're added to Records.
@@ -63,6 +60,11 @@ func NewRecord(req *http.Request, store bool) Record {
 
 	// Values from http.Header
 	r.parseValuesFromHeader()
+
+	// TODO: In NewRecord why am I handling mapping automatically.
+	if store != nil {
+		store.Add(r)
+	}
 
 	return r
 }

@@ -3,13 +3,14 @@ package records
 import "testing"
 
 func TestRecordMap_Add(t *testing.T) {
-	m := RecordMap{}
+	m := NewRecordMap()
 	r1 := fullRecord()
 
 	m.Add(r1)
 
-	if m.Size() != 1 {
-		t.Error("Expected item to be added to RecordMap")
+	size := m.Size()
+	if size != 1 {
+		t.Error("Expected 1 items to be added to RecordMap, got len", size)
 	}
 
 	rec1, _ := m.get(r1.hash())
@@ -23,5 +24,13 @@ func TestRecordMap_Add(t *testing.T) {
 	rec2, _ := m.get(r2.hash())
 	if rec2.Iterations != 2 {
 		t.Error("Expected Iterations=2, was", rec2.Iterations)
+	}
+
+	r3 := fullRecord()
+	r3.Method = "POST"
+	m.Add(r3)
+	size = m.Size()
+	if size != 2 {
+		t.Error("Expected 2 items to be added to RecordMap, got len", size)
 	}
 }

@@ -15,9 +15,13 @@ const FLAG_HEADER = "X-NoopServerFlags"
 func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	begin := time.Now()
 
-	record := records.NewRecord(r, record)
-	log.Printf("Creating: %+v\n", record)
-	log.Printf("From: %+v\n", r)
+	var store *records.RecordMap
+	if record {
+		// Use default store.
+		store = records.GetStore()
+	}
+
+	record := records.NewRecord(r, store)
 
 	f := format
 	if record.Echo {
