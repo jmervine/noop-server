@@ -2,7 +2,10 @@ module github.com/jmervine/noop-server
 
 go 1.18
 
-require github.com/urfave/cli/v2 v2.27.1
+require (
+	github.com/pkg/errors v0.9.1
+	github.com/urfave/cli/v2 v2.27.1
+)
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect

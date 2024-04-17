@@ -1,0 +1,28 @@
+?   	github.com/jmervine/noop-server/cmd/noop-server	[no test files]
+?   	github.com/jmervine/noop-server/lib/config	[no test files]
+goos: darwin
+goarch: amd64
+pkg: github.com/jmervine/noop-server/lib/net/server
+cpu: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
+BenchmarkGet-16    	    5126	    318901 ns/op	   27692 B/op	     145 allocs/op
+PASS
+ok  	github.com/jmervine/noop-server/lib/net/server	3.173s
+PASS
+ok  	github.com/jmervine/noop-server/lib/recorder	0.166s
+goos: darwin
+goarch: amd64
+pkg: github.com/jmervine/noop-server/lib/records
+cpu: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
+BenchmarkRecordMapAddOne-16                 	  752292	      1369 ns/op	     456 B/op	      10 allocs/op
+BenchmarkRecordMapAddMany-16                	  872340	      1346 ns/op	     456 B/op	      10 allocs/op
+BenchmarkRecord_parseValuesFromHeader-16    	34860250	        35.16 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRecord_hash-16                     	  905748	      1301 ns/op	     456 B/op	      10 allocs/op
+PASS
+ok  	github.com/jmervine/noop-server/lib/records	4.866s
+goos: darwin
+goarch: amd64
+pkg: github.com/jmervine/noop-server/lib/records/formatter
+cpu: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
+BenchmarkRecordMapAddOne-16    	  601951	      1746 ns/op	     848 B/op	      24 allocs/op
+PASS
+ok  	github.com/jmervine/noop-server/lib/records/formatter	1.231s

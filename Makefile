@@ -2,7 +2,7 @@ default: test build
 
 .PHONY: test
 test:
-	go test -v -race ./...
+	go test -race ./...
 
 .PHONY: build
 build:
@@ -16,7 +16,7 @@ push:
 
 .PHONY: push
 run:
-	go run ./cmd/noop-server/
+	go run ./cmd/noop-server/ --record
 
 bin/noop-server:
 	go build -o bin/noop-server ./cmd/noop-server/...
@@ -52,3 +52,8 @@ clean:
 .PHONY: todos
 todos:
 	@git grep -n TODO | grep -v Makefile | awk -F':' '{ print " - TODO["$$1":"$$2"]:"$$NF }'
+
+.PHONY: benchmark
+benchmark:
+	# This target requires that 'tee' is installed
+	go test -count=1 -benchmem -run='^$$' -bench '^Benchmark.*$$' github.com/jmervine/noop-server/... | tee BENCHMARK.txt
