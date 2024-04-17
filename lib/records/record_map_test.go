@@ -1,6 +1,8 @@
 package records
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestRecordMap_Add(t *testing.T) {
 	m := NewRecordMap()
@@ -32,5 +34,24 @@ func TestRecordMap_Add(t *testing.T) {
 	size = m.Size()
 	if size != 2 {
 		t.Error("Expected 2 items to be added to RecordMap, got len", size)
+	}
+}
+
+func BenchmarkRecordMapAddOne(b *testing.B) {
+	rm := GetStore()
+
+	for n := 0; n < b.N; n++ {
+		rec := fullRecord()
+		_ = rm.Add(rec)
+	}
+}
+
+func BenchmarkRecordMapAddMany(b *testing.B) {
+	rm := GetStore()
+
+	for n := 0; n < b.N; n++ {
+		rec := fullRecord()
+		rec.Iterations = n
+		_ = rm.Add(rec)
 	}
 }

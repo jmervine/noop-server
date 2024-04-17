@@ -52,3 +52,7 @@ clean:
 .PHONY: todos
 todos:
 	@git grep -n TODO | grep -v Makefile | awk -F':' '{ print " - TODO["$$1":"$$2"]:"$$NF }'
+
+.PHONY: benchmark
+benchmark:
+	go test -count=1 -benchmem -run='^$$' -bench '^Benchmark.*$$' github.com/jmervine/noop-server/...

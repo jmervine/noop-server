@@ -9,13 +9,13 @@ import (
 
 // These functions can be used in all formatter tests.
 func recordMap() *records.RecordMap {
-	m := new(records.RecordMap)
+	m := records.NewRecordMap()
 	r1 := record()
-	m.Add(r1)
+	_ = m.Add(r1)
 
 	r2 := record()
 	r2.Method = "POST"
-	m.Add(r2)
+	_ = m.Add(r2)
 
 	return m
 }

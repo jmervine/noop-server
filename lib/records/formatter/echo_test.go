@@ -6,20 +6,29 @@ import (
 	"testing"
 )
 
-func Echo_FormatRecordMap(t *testing.T) {
+func TestEcho_FormatRecordMap(t *testing.T) {
 	m := recordMap()
 	f := Echo{}
 	r := f.FormatRecordMap(m)
 	l1 := fmt.Sprintf(ECHO_TEMPLATE, 200, "OK", "GET", "/testing", "Foo:bar")
 	l2 := fmt.Sprintf(ECHO_TEMPLATE, 200, "OK", "POST", "/testing", "Foo:bar")
-	e := strings.Join([]string{l1, l2}, DEFAULT_HEADER_JOIN)
+	e := strings.Join([]string{l1, l2}, "\n")
 
 	if e != r {
-		t.Error("Expected format was not returned, got:", r)
+		t.Errorf("\nExpected:\n%s\nGot:\n%s\n", e, r)
 	}
 }
 
-func Echo_FormatRecord(t *testing.T) {
+func BenchmarkRecordMapAddOne(b *testing.B) {
+	m := recordMap()
+	f := Echo{}
+
+	for n := 0; n < b.N; n++ {
+		_ = f.FormatRecordMap(m)
+	}
+}
+
+func TestEcho_FormatRecord(t *testing.T) {
 	f := Echo{}
 	rec := record()
 	r := f.FormatRecord(rec)
@@ -30,6 +39,6 @@ func Echo_FormatRecord(t *testing.T) {
 	}
 }
 
-func Echo_FormatHeaderTest(t *testing.T) {
+func TestEcho_FormatHeaderTest(t *testing.T) {
 	t.Skip("This uses a common formatter from 'formatter' which is already tested.")
 }

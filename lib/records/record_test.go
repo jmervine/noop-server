@@ -37,29 +37,39 @@ func TestRecord_parseStatus(t *testing.T) {
 
 func TestRecord_parseValuesFromHeader(t *testing.T) {
 	// New Record with defaults
-	r := emptyRecord()
+	r1 := emptyRecord()
 
 	// Without values in header
-	r.Headers.Add("foo", "bar")
-	r.parseValuesFromHeader()
-	if DEFAULT_STATUS != r.Status {
-		t.Errorf("Expected status=%v, was %v", DEFAULT_STATUS, r.Status)
+	r1.Headers.Add(RECORD_HEADER, "status:200;sleep:10;echo")
+	r1.parseValuesFromHeader()
+	if DEFAULT_STATUS != r1.Status {
+		t.Errorf("Expected status=%v, was %v", DEFAULT_STATUS, r1.Status)
 	}
 
+	r2 := emptyRecord()
 	s := "status:404;echo;sleep:1s"
-	r.Headers.Add(RECORD_HEADER, s)
+	r2.Headers.Add(RECORD_HEADER, s)
 
-	r.parseValuesFromHeader()
-	if http.StatusNotFound != r.Status {
-		t.Errorf("Expected status=%v, was %v", http.StatusNotFound, r.Status)
+	r2.parseValuesFromHeader()
+	if http.StatusNotFound != r2.Status {
+		t.Errorf("Expected status=%v, was %v", http.StatusNotFound, r2.Status)
 	}
 
-	if time.Second != r.Sleep {
-		t.Errorf("Expected sleep=%v, was %v", time.Second, r.Sleep)
+	if time.Second != r2.Sleep {
+		t.Errorf("Expected sleep=%v, was %v", time.Second, r2.Sleep)
 	}
 
-	if !r.Echo {
+	if !r2.Echo {
 		t.Error("Expected echo to be true")
+	}
+}
+
+func BenchmarkRecord_parseValuesFromHeader(b *testing.B) {
+	r := emptyRecord()
+	r.Headers.Add("foo", "bar")
+
+	for n := 0; n < b.N; n++ {
+		r.parseValuesFromHeader()
 	}
 }
 
@@ -92,5 +102,12 @@ func TestRecord_hash(t *testing.T) {
 
 	if r1.hash() == r3.hash() {
 		t.Error("Expected r1 and r3 to have difference hashes")
+	}
+}
+
+func BenchmarkRecord_hash(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		rec := fullRecord()
+		_ = rec.hash()
 	}
 }

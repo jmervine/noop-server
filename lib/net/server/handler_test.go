@@ -1,6 +1,8 @@
 package server
 
 import (
+	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -23,6 +25,23 @@ func TestGet(t *testing.T) {
 
 	if resp.Request.Method != "GET" {
 		t.Errorf("Expected GET, got: %s", resp.Request.Method)
+	}
+}
+
+func BenchmarkGet(b *testing.B) {
+	old := log.Writer()
+	log.SetOutput(io.Discard)
+	defer func() {
+		log.SetOutput(old)
+	}()
+
+	server := httptest.NewServer(http.HandlerFunc(handlerFunc))
+
+	for n := 0; n < b.N; n++ {
+		_, err := http.Get(server.URL)
+		if err != nil {
+			b.Errorf("Expected nil, got: %v", err)
+		}
 	}
 }
 
