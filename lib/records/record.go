@@ -42,7 +42,7 @@ func GetStore() *RecordMap {
 	return defaultStore
 }
 
-func NewRecord(req *http.Request, store *RecordMap) Record {
+func NewRecord(req *http.Request) Record {
 	r := Record{}
 
 	// Because this will parse a single request, the iterations will always be 1
@@ -60,11 +60,6 @@ func NewRecord(req *http.Request, store *RecordMap) Record {
 
 	// Values from http.Header
 	r.parseValuesFromHeader()
-
-	// TODO: In NewRecord why am I handling mapping automatically.
-	if store != nil {
-		store.Add(r)
-	}
 
 	return r
 }
@@ -115,7 +110,6 @@ func (r *Record) parseValuesFromHeader() {
 
 }
 
-// TODO: Record.parseStatus - consider return error
 func (r *Record) parseStatus(s string) {
 	if i, e := strconv.ParseInt(s, 10, 16); e == nil {
 		r.Status = int(i)
@@ -126,7 +120,6 @@ func (r *Record) parseStatus(s string) {
 	r.Status = DEFAULT_STATUS
 }
 
-// TODO: Record.parseSleep - consider return error
 func (r *Record) parseSleep(s string) {
 	// Support direct duration format - e.g. 1s 2ms, etc.
 	dur, err := time.ParseDuration(s)
