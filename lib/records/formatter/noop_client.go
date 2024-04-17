@@ -33,7 +33,7 @@ func (f NoopClient) FormatRecord(r records.Record) string {
 		r.Method,
 		r.Endpoint,
 		f.FormatHeader(r.Headers),
-		r.Sleep,
+		int64(r.Sleep*time.Millisecond),
 	)
 }
 

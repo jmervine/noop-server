@@ -16,7 +16,7 @@ push:
 
 .PHONY: push
 run:
-	go run ./cmd/noop-server/
+	go run ./cmd/noop-server/ --record
 
 bin/noop-server:
 	go build -o bin/noop-server ./cmd/noop-server/...
