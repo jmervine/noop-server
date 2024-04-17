@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jmervine/noop-server/lib/recorder"
 	"github.com/jmervine/noop-server/lib/records"
 	"github.com/jmervine/noop-server/lib/records/formatter"
 )
@@ -13,34 +12,24 @@ import (
 const FLAG_HEADER = "X-NoopServerFlags"
 
 func handlerFunc(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
 	begin := time.Now()
-
-	var store *records.RecordMap
-	if record {
-		// Use default store.
-		store = records.GetStore()
-	}
-
 	record := records.NewRecord(r, store)
 
-	f := format
+	respFmt := defaultFmt
 	if record.Echo {
-		f = new(formatter.Echo)
+		respFmt = new(formatter.Echo)
 	}
 
-	out := recorder.StdRecorder{}
-	out.SetFormatter(f)
-	out.SetWriter(w)
-
-	w.WriteHeader(record.Status)
-
-	defer func() {
-		defer r.Body.Close()
-
-		f := formatter.NewLogFormatter("server.handlerFunc", time.Since(begin), r.Body, verbose)
-		log.Printf("%s", f.FormatRecord(record))
-	}()
+	// Stream record to record file, if stream enabled
+	if cfg.StreamRecord {
+		stream.WriteOne(record)
+	}
 
 	record.DoSleep() // Only sleeps if sleep is set
-	out.WriteOne(record)
+	http.Error(w, respFmt.FormatRecord(record), record.Status)
+
+	logFmt := formatter.NewLogFormatter("server.handlerFunc", time.Since(begin), r.Body, cfg.Verbose)
+	log.Printf("%s", logFmt.FormatRecord(record))
 }

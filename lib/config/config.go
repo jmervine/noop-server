@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 
 	"github.com/urfave/cli/v2"
@@ -25,12 +24,13 @@ type Config struct {
 
 	Verbose bool
 
+	StreamRecord bool
 	Record       bool
 	RecordTarget string
 }
 
-func Init(args []string) *Config {
-	c := Config{}
+func Init(args []string) (*Config, error) {
+	c := new(Config)
 
 	helpPrinter := cli.HelpPrinter
 	cli.HelpPrinter = func(w io.Writer, t string, d interface{}) {
@@ -110,6 +110,13 @@ func Init(args []string) *Config {
 			Value:       false,
 			Destination: &c.Record,
 		},
+		&cli.BoolFlag{
+			Name:        "stream-record",
+			Aliases:     []string{"s"},
+			Usage:       "Stream record results to a file", // (adds notable overhead [+/- 25us])",
+			Value:       false,
+			Destination: &c.StreamRecord,
+		},
 		&cli.StringFlag{
 			Name:        "record-target",
 			Aliases:     []string{"t"},
@@ -123,10 +130,24 @@ func Init(args []string) *Config {
 	}
 
 	if err := app.Run(args); err != nil {
-		log.Fatal(err)
+		return c, err
 	}
 
-	return &c
+	if err := c.validate(); err != nil {
+		return c, err
+	}
+
+	return c, nil
+}
+
+func (c Config) validate() error {
+	if c.Record && c.StreamRecord {
+		return errors.New("both record and stream-record flags cannot be set, pick one")
+	}
+
+	// Add more validators here as needed.
+
+	return nil
 }
 
 func (c Config) Listener() string {
@@ -139,6 +160,10 @@ func (c Config) TLSEnabled() bool {
 
 func (c Config) MTLSEnabled() bool {
 	return (c.TLSEnabled() && c.CertCAPath != "")
+}
+
+func (c Config) Recording() bool {
+	return c.Record || c.StreamRecord
 }
 
 func (c Config) ToString() string {
@@ -158,7 +183,7 @@ func (c Config) ToString() string {
 //
 // This returned 'os.File' must be closed when you're done with it.
 func (c Config) RecordFile() (*os.File, error) {
-	if !c.Record {
+	if !c.Recording() {
 		return nil, nil
 	}
 
@@ -189,7 +214,7 @@ func (c Config) RecordFile() (*os.File, error) {
 }
 
 // REF: https://stackoverflow.com/a/62179184
-// This moves the file, removing the original file.
+// This copies the file
 func createBackup(src, dst string) error {
 	in, err := os.Open(src)
 	if err != nil {
@@ -223,9 +248,5 @@ func createBackup(src, dst string) error {
 		return fmt.Errorf("chmod error: %s", err)
 	}
 
-	err = os.Remove(src)
-	if err != nil {
-		return fmt.Errorf("failed removing original file: %s", err)
-	}
 	return nil
 }

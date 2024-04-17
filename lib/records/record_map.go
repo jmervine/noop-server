@@ -18,7 +18,7 @@ func NewRecordMap() *RecordMap {
 }
 
 // Returns true if the item was added, and false if it was updated
-func (rm *RecordMap) Add(rec Record) bool {
+func (rm *RecordMap) Add(rec Record) {
 	hash := rec.hash()
 
 	unlock := rm.rwLocker()
@@ -27,11 +27,10 @@ func (rm *RecordMap) Add(rec Record) bool {
 	if r, ok := rm.store[hash]; ok {
 		r.Iterations++
 		rm.store[hash] = r
-		return false
+		return
 	}
 
 	rm.store[hash] = rec
-	return true
 }
 
 // Returns a snapshot of k/v pair at the moment

@@ -21,7 +21,12 @@ func init() {
 }
 
 func main() {
-	cfg = config.Init(os.Args)
+	var err error
+	cfg, err = config.Init(os.Args)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	log.SetPrefix(fmt.Sprintf("app=%s ", cfg.App))
 	log.Printf("on=startup %s\n", cfg.ToString())

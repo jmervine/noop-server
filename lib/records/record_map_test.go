@@ -42,7 +42,7 @@ func BenchmarkRecordMapAddOne(b *testing.B) {
 
 	for n := 0; n < b.N; n++ {
 		rec := fullRecord()
-		_ = rm.Add(rec)
+		rm.Add(rec)
 	}
 }
 
@@ -52,6 +52,6 @@ func BenchmarkRecordMapAddMany(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		rec := fullRecord()
 		rec.Iterations = n
-		_ = rm.Add(rec)
+		rm.Add(rec)
 	}
 }

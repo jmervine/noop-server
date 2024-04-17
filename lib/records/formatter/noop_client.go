@@ -16,7 +16,9 @@ import (
 // TODO: NoopClient needs a host somehow
 const NOOP_CLEINT_TEMPLATE = "%d|%s|%s|%s|%v"
 
-type NoopClient struct{}
+type NoopClient struct {
+	NewLine bool
+}
 
 func (f NoopClient) FormatRecordMap(mapped *records.RecordMap) string {
 	return fmt.Sprintf(
@@ -27,7 +29,7 @@ func (f NoopClient) FormatRecordMap(mapped *records.RecordMap) string {
 }
 
 func (f NoopClient) FormatRecord(r records.Record) string {
-	return fmt.Sprintf(
+	out := fmt.Sprintf(
 		NOOP_CLEINT_TEMPLATE,
 		r.Iterations,
 		r.Method,
@@ -35,6 +37,12 @@ func (f NoopClient) FormatRecord(r records.Record) string {
 		f.FormatHeader(r.Headers),
 		int64(r.Sleep*time.Millisecond),
 	)
+
+	if f.NewLine {
+		out = out + "\n"
+	}
+
+	return out
 }
 
 func (f NoopClient) FormatHeader(headers *http.Header) string {

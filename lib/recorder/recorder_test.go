@@ -1,9 +1,10 @@
 package recorder
 
 import (
-	"bytes"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/jmervine/noop-server/lib/records"
@@ -26,17 +27,31 @@ func record() *records.Record {
 }
 
 func TestStdRecord(t *testing.T) {
-	var buf bytes.Buffer
+	result, err := capture(func(w *os.File) {
+		rec := record()
+		f := &formatter.Echo{}
+		recr := &StdRecorder{}
 
-	rec := record()
-	f := &formatter.Echo{}
-	r := StdRecorder{}
+		recr.SetFormatter(f)
+		recr.SetWriter(w)
 
-	r.SetFormatter(f)
-	r.SetWriter(&buf)
-	r.WriteOne(*rec)
+		if recr.formatter == nil {
+			t.Error("Expected formatter to be set")
+		}
 
-	result := buf.String()
+		if recr.writer == nil {
+			t.Error("Expected writer to be set")
+		}
+
+		if err := recr.WriteOne(*rec); err != nil {
+			t.Error(err)
+		}
+	})
+
+	if err != nil {
+		t.Error(err)
+	}
+
 	expect := fmt.Sprintf(
 		formatter.ECHO_TEMPLATE,
 		200, "OK", "GET", "/testing", "Foo:bar",
@@ -45,4 +60,25 @@ func TestStdRecord(t *testing.T) {
 	if result != expect {
 		t.Errorf("Expected '%s', got '%s'", expect, result)
 	}
+}
+
+func capture(fn func(*os.File)) (res string, err error) {
+	rpipe, wpipe, err := os.Pipe()
+
+	if err != nil {
+		return
+	}
+
+	fn(wpipe)
+	err = wpipe.Close()
+	if err != nil {
+		return
+	}
+
+	bres, err := io.ReadAll(rpipe)
+	if err != nil {
+		return
+	}
+
+	return string(bres[:]), nil
 }

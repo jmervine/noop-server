@@ -11,11 +11,11 @@ import (
 func recordMap() *records.RecordMap {
 	m := records.NewRecordMap()
 	r1 := record()
-	_ = m.Add(r1)
+	m.Add(r1)
 
 	r2 := record()
 	r2.Method = "POST"
-	_ = m.Add(r2)
+	m.Add(r2)
 
 	return m
 }
