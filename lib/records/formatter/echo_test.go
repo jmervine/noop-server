@@ -2,6 +2,8 @@ package formatter
 
 import (
 	"fmt"
+	"reflect"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -9,13 +11,20 @@ import (
 func TestEcho_FormatRecordMap(t *testing.T) {
 	m := recordMap()
 	f := Echo{}
-	r := f.FormatRecordMap(m)
-	l1 := fmt.Sprintf(ECHO_TEMPLATE, 200, "OK", "GET", "/testing", "Foo:bar")
-	l2 := fmt.Sprintf(ECHO_TEMPLATE, 200, "OK", "POST", "/testing", "Foo:bar")
-	e := strings.Join([]string{l1, l2}, "\n")
 
-	if e != r {
-		t.Errorf("\nExpected:\n%s\nGot:\n%s\n", e, r)
+	// Remove trailing newline and split on newline, and then sort
+	got := strings.Split(strings.TrimRight(f.FormatRecordMap(m), "\n"), "\n")
+	sort.Strings(got)
+
+	// because I can't trust order
+	exp := []string{
+		fmt.Sprintf(ECHO_TEMPLATE, 200, "OK", "GET", "/testing", "Foo:bar"),
+		fmt.Sprintf(ECHO_TEMPLATE, 200, "OK", "POST", "/testing", "Foo:bar"),
+	}
+	sort.Strings(exp)
+
+	if !reflect.DeepEqual(got, exp) {
+		t.Errorf("\nExpected:\n%s\nGot:\n%s\n", exp, got)
 	}
 }
 

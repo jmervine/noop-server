@@ -2,6 +2,7 @@ package records
 
 import (
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 )
@@ -17,9 +18,108 @@ func emptyRecord() Record {
 
 func fullRecord() Record {
 	r := emptyRecord()
-	r.Endpoint = "http://www.example.com"
+
+	e, _ := url.Parse("http://www.example.com")
+	r.endpoint = e
 	r.Method = "GET"
+
 	return r
+}
+
+func TestRecord_NewRecord(t *testing.T) {
+	headers := http.Header{}
+	headers.Add(RECORD_HEADER, "echo;status:201;sleep:1")
+	request := &http.Request{
+		URL: &url.URL{
+			Scheme: "https",
+			Host:   "test.host",
+			Path:   "/testing",
+		},
+		Header: headers,
+		Host:   "host.test.host",
+	}
+
+	defHost := "localhost:3000"
+
+	record := NewRecord(request, defHost, nil)
+
+	if record.Iterations != 1 {
+		t.Error("Expected record.Iterations to be 1, got", record.Iterations)
+	}
+
+	// Endpoint handling
+	if record.endpoint.Scheme != "https" {
+		t.Error("Expected record.endpoint.Scheme to be https, got", record.endpoint.Scheme)
+	}
+
+	if record.endpoint.Host != "test.host" {
+		t.Error("Expected record.endpoint.Host to be test.host, got", record.endpoint.Host)
+	}
+
+	if record.endpoint.Path != "/testing" {
+		t.Error("Expected record.endpoint.Path to be '/testing', got", record.endpoint.Path)
+	}
+
+	// Header handling
+	if record.Status != 201 {
+		t.Error("Expected record.Status to be 201, got", record.Status)
+	}
+
+	gots := time.Duration(record.Sleep * time.Millisecond)
+	exps := time.Duration(time.Millisecond)
+	if record.Sleep != time.Duration(time.Millisecond) {
+		t.Errorf("Expected record.Sleep to be %d, got %d", exps, gots)
+	}
+
+	if !record.Echo {
+		t.Error("Expected record.Echo to be true")
+	}
+}
+
+func TestRecord_NewRecord_withRequestHost(t *testing.T) {
+	request := &http.Request{
+		Host: "https://host.test.host",
+	}
+	record := NewRecord(request, "", nil)
+
+	if record.endpoint.Scheme != "https" {
+		t.Error("Expected record.endpoint.Schmeme to be https, got", record.endpoint.Scheme)
+	}
+
+	if record.endpoint.Host != "host.test.host" {
+		t.Error("Expected record.endpoint.Host to be host.test.host, got", record.endpoint.Host)
+	}
+}
+
+func TestRecord_NewRecord_withDefaultHost(t *testing.T) {
+	request := &http.Request{}
+	record := NewRecord(request, "https://default.test.host:3333", nil)
+
+	if record.endpoint.Scheme != "https" {
+		t.Error("Expected record.endpoint.Schmeme to be https, got", record.endpoint.Scheme)
+	}
+
+	if record.endpoint.Host != "default.test.host:3333" {
+		t.Error("Expected record.endpoint.Host to be default.test.host:3333, got", record.endpoint.Host)
+	}
+}
+
+func TestRecord_Endpoint(t *testing.T) {
+	rec := fullRecord()
+	exp := "http://www.example.com"
+	got := rec.Endpoint()
+	if exp != got {
+		t.Errorf("Expected %s, got %s", exp, got)
+	}
+
+	rec = fullRecord()
+	rec.endpoint.Scheme = ""
+	rec.endpoint.Host = ""
+	exp = "http://localhost"
+	got = rec.Endpoint()
+	if exp != got {
+		t.Errorf("Expected %s, got %s", exp, got)
+	}
 }
 
 func TestRecord_parseStatus(t *testing.T) {
@@ -92,9 +192,10 @@ func TestRecord_parseSleep(t *testing.T) {
 }
 
 func TestRecord_hash(t *testing.T) {
-	r1 := Record{Status: 200, Endpoint: "http://localhost/foo1"}
-	r2 := Record{Status: 200, Endpoint: "http://localhost/foo1"}
-	r3 := Record{Status: 300, Endpoint: "http://localhost/foo1"}
+	e, _ := url.Parse("http://localhost/foo1")
+	r1 := Record{Status: 200, endpoint: e}
+	r2 := Record{Status: 200, endpoint: e}
+	r3 := Record{Status: 300, endpoint: e}
 
 	if r1.hash() != r2.hash() {
 		t.Error("Expected r1 and r1 to have the same hash")

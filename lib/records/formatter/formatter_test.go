@@ -2,6 +2,7 @@ package formatter
 
 import (
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/jmervine/noop-server/lib/records"
@@ -20,16 +21,24 @@ func recordMap() *records.RecordMap {
 	return m
 }
 
+func request() *http.Request {
+	u, _ := url.Parse("http://test.host/testing")
+	req := new(http.Request)
+	req.Method = "GET"
+	req.URL = u
+	req.Header = headers(true)
+
+	return req
+}
+
 func record() records.Record {
-	h := headers(true)
-	return records.Record{
-		Iterations: 1,
-		Status:     http.StatusOK,
-		Sleep:      0,
-		Headers:    &h,
-		Endpoint:   "/testing",
-		Method:     "GET",
-	}
+	req := request()
+	r := records.NewRecord(req, "", nil)
+	r.Iterations = 1
+	r.Status = http.StatusOK
+	r.Sleep = 0
+
+	return r
 }
 
 // Because sorting isn't assured, we have the option to say give me

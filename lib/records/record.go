@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -27,7 +28,7 @@ const RECORD_HASH_STRING = "status=%d|method=%s|endpoint=%s|header=%#v|sleep=%v|
 type Record struct {
 	Iterations int
 	Headers    *http.Header
-	Endpoint   string
+	endpoint   *url.URL // internal holder for raw url struct
 	Method     string
 
 	// TODO: Record - Consider using fetcher methods for Status and Sleep to ensure safty
@@ -42,7 +43,7 @@ func GetStore() *RecordMap {
 	return defaultStore
 }
 
-func NewRecord(req *http.Request, store *RecordMap) Record {
+func NewRecord(req *http.Request, dHost string, store *RecordMap) Record {
 	r := Record{}
 
 	// Because this will parse a single request, the iterations will always be 1
@@ -54,7 +55,8 @@ func NewRecord(req *http.Request, store *RecordMap) Record {
 	r.Status = DEFAULT_STATUS
 
 	// Values from http.Request
-	r.Endpoint = req.URL.Path
+	r.setEndpoint(req, dHost)
+
 	r.Method = req.Method
 	r.Headers = &req.Header
 
@@ -67,6 +69,28 @@ func NewRecord(req *http.Request, store *RecordMap) Record {
 	}
 
 	return r
+}
+
+// Takes listener for a default Host, if not provided.
+func (r *Record) Endpoint() string {
+	// Handle defaults on display
+	scheme := r.endpoint.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+
+	host := r.endpoint.Host
+	if host == "" {
+		host = "localhost"
+	}
+
+	path := r.endpoint.Path
+
+	return fmt.Sprintf("%s://%s%s", scheme, host, path)
+}
+
+func (r *Record) Path() string {
+	return r.endpoint.Path
 }
 
 func (r *Record) DoSleep() {
@@ -144,9 +168,43 @@ func (r *Record) parseSleep(s string) {
 	r.Sleep = 0
 }
 
-func (r Record) hash() string {
+// If the endpoint doesn't contain a scheme://host, then attempt to get
+// it from the request. If it's not there, use the default, which should
+// come from config.Listener()
+func (r *Record) setEndpoint(req *http.Request, defHost string) {
+	r.endpoint = req.URL
+
+	// This shouldn't ever happen, but for safty
+	if r.endpoint == nil {
+		r.endpoint = &url.URL{}
+	}
+
+	if r.endpoint.Host != "" {
+		return
+	}
+
+	reqParse, reqErr := url.Parse(req.Host)
+	if reqErr == nil && reqParse != nil {
+		if reqParse.Scheme != "" {
+			r.endpoint.Scheme = reqParse.Scheme
+		}
+		r.endpoint.Host = reqParse.Host
+	}
+
+	if r.endpoint.Host != "" {
+		return
+	}
+
+	dParse, dErr := url.Parse(defHost)
+	if dErr == nil && dParse != nil {
+		r.endpoint.Scheme = dParse.Scheme
+		r.endpoint.Host = dParse.Host
+	}
+}
+
+func (r *Record) hash() string {
 	hstr := fmt.Sprintf(RECORD_HASH_STRING,
-		r.Status, r.Method, r.Endpoint,
+		r.Status, r.Method, r.Endpoint(),
 		r.Headers, r.Sleep, r.Echo,
 	)
 	hash := sha256.Sum256([]byte(hstr))

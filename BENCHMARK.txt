@@ -4,25 +4,25 @@ goos: darwin
 goarch: amd64
 pkg: github.com/jmervine/noop-server/lib/net/server
 cpu: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
-BenchmarkGet-16    	    5126	    318901 ns/op	   27692 B/op	     145 allocs/op
+BenchmarkGet-16    	    4764	    295252 ns/op	   28103 B/op	     151 allocs/op
 PASS
-ok  	github.com/jmervine/noop-server/lib/net/server	3.173s
+ok  	github.com/jmervine/noop-server/lib/net/server	2.746s
 PASS
-ok  	github.com/jmervine/noop-server/lib/recorder	0.166s
+ok  	github.com/jmervine/noop-server/lib/recorder	0.169s
 goos: darwin
 goarch: amd64
 pkg: github.com/jmervine/noop-server/lib/records
 cpu: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
-BenchmarkRecordMapAddOne-16                 	  752292	      1369 ns/op	     456 B/op	      10 allocs/op
-BenchmarkRecordMapAddMany-16                	  872340	      1346 ns/op	     456 B/op	      10 allocs/op
-BenchmarkRecord_parseValuesFromHeader-16    	34860250	        35.16 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRecord_hash-16                     	  905748	      1301 ns/op	     456 B/op	      10 allocs/op
+BenchmarkRecordMapAddOne-16                 	  684847	      1751 ns/op	     656 B/op	      14 allocs/op
+BenchmarkRecordMapAddMany-16                	  673813	      1818 ns/op	     656 B/op	      14 allocs/op
+BenchmarkRecord_parseValuesFromHeader-16    	33581304	        35.44 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRecord_hash-16                     	  645164	      1750 ns/op	     656 B/op	      14 allocs/op
 PASS
-ok  	github.com/jmervine/noop-server/lib/records	4.866s
+ok  	github.com/jmervine/noop-server/lib/records	6.014s
 goos: darwin
 goarch: amd64
 pkg: github.com/jmervine/noop-server/lib/records/formatter
 cpu: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
-BenchmarkRecordMapAddOne-16    	  601951	      1746 ns/op	     848 B/op	      24 allocs/op
+BenchmarkRecordMapAddOne-16    	  606506	      1799 ns/op	     848 B/op	      24 allocs/op
 PASS
-ok  	github.com/jmervine/noop-server/lib/records/formatter	1.231s
+ok  	github.com/jmervine/noop-server/lib/records/formatter	1.276s

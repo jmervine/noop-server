@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"testing"
 
@@ -11,19 +12,30 @@ import (
 	"github.com/jmervine/noop-server/lib/records/formatter"
 )
 
-func record() *records.Record {
-	header := &http.Header{}
+func request() *http.Request {
+	header := http.Header{}
 	header.Add("foo", "bar")
 
-	return &records.Record{
-		Iterations: 1,
-		Headers:    header,
-		Endpoint:   "http://localhost/testing",
-		Method:     "GET",
-		Status:     http.StatusOK,
-		Sleep:      0,
-		Echo:       false,
-	}
+	u, _ := url.Parse("http://localhost/testing")
+
+	req := new(http.Request)
+
+	req.Method = "GET"
+	req.URL = u
+	req.Header = header
+
+	return req
+}
+
+func record() records.Record {
+	req := request()
+	r := records.NewRecord(req, "test.host:3333", nil)
+	r.Iterations = 1
+	r.Status = http.StatusOK
+	r.Sleep = 0
+	r.Echo = false
+
+	return r
 }
 
 func TestStdRecord(t *testing.T) {
@@ -43,7 +55,7 @@ func TestStdRecord(t *testing.T) {
 			t.Error("Expected writer to be set")
 		}
 
-		if err := recr.WriteOne(*rec); err != nil {
+		if err := recr.WriteOne(rec); err != nil {
 			t.Error(err)
 		}
 	})
