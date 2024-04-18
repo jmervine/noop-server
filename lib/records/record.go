@@ -9,31 +9,40 @@ import (
 	"time"
 )
 
+// TODO: Consider making MAX_SLEEP a cli arg
 const MAX_SLEEP = (15 * time.Second)
+
+// TODO: Consider making RECORD_HEADER a cli arg
 const RECORD_HEADER = "X-Noopserverflags"
+
 const SPLIT_RECORD_HEADER = ";"
 const SPLIT_HEADER_VALUE = ":"
+
+// TODO: Consider making DEFAULT_STATUS a cli arg
 const DEFAULT_STATUS = http.StatusOK
 
 // Used to create a string for hashing a Record
-const RECORD_HASH_STRING = "status=%d|method=%s|host=%s|path=%s|header=%#v|sleep=%v|echo=%v"
+const RECORD_HASH_STRING = "status=%d|method=%s|endpoint=%s|header=%#v|sleep=%v|echo=%v"
 
 type Record struct {
 	Iterations int
 	Headers    *http.Header
-	Path       string
+	Endpoint   string
 	Method     string
-	Status     int
-	Sleep      time.Duration
-	Echo       bool
-	Host       string
+
+	// TODO: Record - Consider using fetcher methods for Status and Sleep to ensure safty
+	Status int
+	Sleep  time.Duration
+
+	// TODO: Record - Support Body in Record, perhapse instead of Echo
+	Echo bool
 }
 
 func GetStore() *RecordMap {
 	return defaultStore
 }
 
-func NewRecord(req *http.Request) Record {
+func NewRecord(req *http.Request, store *RecordMap) Record {
 	r := Record{}
 
 	// Because this will parse a single request, the iterations will always be 1
@@ -45,12 +54,17 @@ func NewRecord(req *http.Request) Record {
 	r.Status = DEFAULT_STATUS
 
 	// Values from http.Request
-	r.Path = req.URL.Path
+	r.Endpoint = req.URL.Path
 	r.Method = req.Method
 	r.Headers = &req.Header
 
 	// Values from http.Header
 	r.parseValuesFromHeader()
+
+	// TODO: In NewRecord why am I handling mapping automatically.
+	if store != nil {
+		store.Add(r)
+	}
 
 	return r
 }
@@ -96,13 +110,12 @@ func (r *Record) parseValuesFromHeader() {
 			r.parseSleep(v)
 		case "echo":
 			r.Echo = true
-		case "host":
-			r.Host = v
 		}
 	}
 
 }
 
+// TODO: Record.parseStatus - consider return error
 func (r *Record) parseStatus(s string) {
 	if i, e := strconv.ParseInt(s, 10, 16); e == nil {
 		r.Status = int(i)
@@ -113,6 +126,7 @@ func (r *Record) parseStatus(s string) {
 	r.Status = DEFAULT_STATUS
 }
 
+// TODO: Record.parseSleep - consider return error
 func (r *Record) parseSleep(s string) {
 	// Support direct duration format - e.g. 1s 2ms, etc.
 	dur, err := time.ParseDuration(s)
@@ -132,7 +146,7 @@ func (r *Record) parseSleep(s string) {
 
 func (r Record) hash() string {
 	hstr := fmt.Sprintf(RECORD_HASH_STRING,
-		r.Status, r.Method, r.Host, r.Path,
+		r.Status, r.Method, r.Endpoint,
 		r.Headers, r.Sleep, r.Echo,
 	)
 	hash := sha256.Sum256([]byte(hstr))

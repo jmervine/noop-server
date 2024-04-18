@@ -15,13 +15,7 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	begin := time.Now()
-	record := records.NewRecord(r)
-	if record.Host == "" {
-		record.Host = cfg.RecordHost
-	}
-	if store != nil {
-		store.Add(record)
-	}
+	record := records.NewRecord(r, store)
 
 	respFmt := defaultFmt
 	if record.Echo {

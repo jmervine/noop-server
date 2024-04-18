@@ -33,7 +33,7 @@ func (f Log) FormatRecordMap(mapped *records.RecordMap) string {
 }
 
 func (f Log) FormatRecord(r records.Record) string {
-	path := commonPath(r.Path)
+	path := commonPath(r.Endpoint)
 
 	str := fmt.Sprintf(LOG_TEMPLATE, f.caller, r.Method, path, r.Status, f.duration)
 

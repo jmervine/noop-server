@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function do_curl {
-  curl -H 'X-NoopServerFlags:echo;sleep=500ms;status=301;host=http://test.host' -d 'foo=bar' localhost:3000/load/$1
+  curl -H 'X-NoopServerFlags:echo;sleep=500ms;status=301' -d 'foo=bar' localhost:3000/load/$1
   echo
 }
 

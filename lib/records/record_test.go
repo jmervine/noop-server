@@ -17,7 +17,7 @@ func emptyRecord() Record {
 
 func fullRecord() Record {
 	r := emptyRecord()
-	r.Host = "http://www.example.com"
+	r.Endpoint = "http://www.example.com"
 	r.Method = "GET"
 	return r
 }
@@ -92,9 +92,9 @@ func TestRecord_parseSleep(t *testing.T) {
 }
 
 func TestRecord_hash(t *testing.T) {
-	r1 := Record{Status: 200, Host: "http://localhost", Path: "/foo1"}
-	r2 := Record{Status: 200, Host: "http://localhost", Path: "/foo1"}
-	r3 := Record{Status: 300, Host: "http://localhost", Path: "/foo1"}
+	r1 := Record{Status: 200, Endpoint: "http://localhost/foo1"}
+	r2 := Record{Status: 200, Endpoint: "http://localhost/foo1"}
+	r3 := Record{Status: 300, Endpoint: "http://localhost/foo1"}
 
 	if r1.hash() != r2.hash() {
 		t.Error("Expected r1 and r1 to have the same hash")
