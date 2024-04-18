@@ -28,7 +28,7 @@ func (f NoopClient) FormatRecordMap(mapped *records.RecordMap) string {
 		out = ts + out
 	}
 
-	return out
+	return out + "\n"
 }
 
 func (f NoopClient) FormatRecord(r records.Record) string {

@@ -56,6 +56,18 @@ func (rm *RecordMap) Size() int {
 	return len(rm.store)
 }
 
+func (rm *RecordMap) Iterations() int {
+	unlock := rm.rLocker()
+	defer unlock()
+	var i int
+
+	for _, val := range rm.store {
+		i += val.Iterations
+	}
+
+	return i
+}
+
 func (rm *RecordMap) rwLocker() func() {
 	rm.mux.Lock()
 	return rm.mux.Unlock
