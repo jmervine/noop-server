@@ -27,6 +27,7 @@ type Config struct {
 	StreamRecord bool
 	Record       bool
 	RecordTarget string
+	RecordHost   string
 }
 
 func Init(args []string) (*Config, error) {
@@ -123,6 +124,13 @@ func Init(args []string) (*Config, error) {
 			Usage:       "Record results to a file",
 			Value:       DEFAULT_RECORD_TARGET,
 			Destination: &c.RecordTarget,
+		},
+		&cli.StringFlag{
+			Name:        "record-host",
+			Aliases:     []string{"H"},
+			Usage:       "Sets host for recorder",
+			Value:       "",
+			Destination: &c.RecordHost,
 		},
 	}
 	app.Action = func(_ *cli.Context) error {

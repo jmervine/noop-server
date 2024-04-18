@@ -18,7 +18,8 @@ func record() *records.Record {
 	return &records.Record{
 		Iterations: 1,
 		Headers:    header,
-		Endpoint:   "http://localhost/testing",
+		Host:       "http://localhost",
+		Path:       "/testing",
 		Method:     "GET",
 		Status:     http.StatusOK,
 		Sleep:      0,

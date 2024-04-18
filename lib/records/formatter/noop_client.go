@@ -12,9 +12,9 @@ import (
 	"github.com/jmervine/noop-server/lib/records"
 )
 
-// # Format is '{iterations:-1}|{method:-GET}|{endpoint}|{headers:-}|{sleep}
+// # Format is '{iterations:-1}|{method:-GET}|{host:-}|{path:-}|{headers:-}|{sleep}'
 // TODO: NoopClient needs a host somehow
-const NOOP_CLEINT_TEMPLATE = "%d|%s|%s|%s|%v"
+const NOOP_CLEINT_TEMPLATE = "%d|%s|%s|%s|%s|%v"
 
 type NoopClient struct {
 	NewLine bool
@@ -33,7 +33,8 @@ func (f NoopClient) FormatRecord(r records.Record) string {
 		NOOP_CLEINT_TEMPLATE,
 		r.Iterations,
 		r.Method,
-		r.Endpoint,
+		r.Host,
+		r.Path,
 		f.FormatHeader(r.Headers),
 		int64(r.Sleep*time.Millisecond),
 	)

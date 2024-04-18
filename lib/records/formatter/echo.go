@@ -18,7 +18,7 @@ func (f Echo) FormatRecordMap(mapped *records.RecordMap) string {
 }
 
 func (f Echo) FormatRecord(r records.Record) string {
-	path := commonPath(r.Endpoint)
+	path := commonPath(r.Path)
 
 	return fmt.Sprintf(
 		ECHO_TEMPLATE,

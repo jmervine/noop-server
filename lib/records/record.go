@@ -9,33 +9,24 @@ import (
 	"time"
 )
 
-// TODO: Consider making MAX_SLEEP a cli arg
 const MAX_SLEEP = (15 * time.Second)
-
-// TODO: Consider making RECORD_HEADER a cli arg
 const RECORD_HEADER = "X-Noopserverflags"
-
 const SPLIT_RECORD_HEADER = ";"
 const SPLIT_HEADER_VALUE = ":"
-
-// TODO: Consider making DEFAULT_STATUS a cli arg
 const DEFAULT_STATUS = http.StatusOK
 
 // Used to create a string for hashing a Record
-const RECORD_HASH_STRING = "status=%d|method=%s|endpoint=%s|header=%#v|sleep=%v|echo=%v"
+const RECORD_HASH_STRING = "status=%d|method=%s|host=%s|path=%s|header=%#v|sleep=%v|echo=%v"
 
 type Record struct {
 	Iterations int
 	Headers    *http.Header
-	Endpoint   string
+	Path       string
 	Method     string
-
-	// TODO: Record - Consider using fetcher methods for Status and Sleep to ensure safty
-	Status int
-	Sleep  time.Duration
-
-	// TODO: Record - Support Body in Record, perhapse instead of Echo
-	Echo bool
+	Status     int
+	Sleep      time.Duration
+	Echo       bool
+	Host       string
 }
 
 func GetStore() *RecordMap {
@@ -54,7 +45,7 @@ func NewRecord(req *http.Request) Record {
 	r.Status = DEFAULT_STATUS
 
 	// Values from http.Request
-	r.Endpoint = req.URL.Path
+	r.Path = req.URL.Path
 	r.Method = req.Method
 	r.Headers = &req.Header
 
@@ -105,6 +96,8 @@ func (r *Record) parseValuesFromHeader() {
 			r.parseSleep(v)
 		case "echo":
 			r.Echo = true
+		case "host":
+			r.Host = v
 		}
 	}
 
@@ -139,7 +132,7 @@ func (r *Record) parseSleep(s string) {
 
 func (r Record) hash() string {
 	hstr := fmt.Sprintf(RECORD_HASH_STRING,
-		r.Status, r.Method, r.Endpoint,
+		r.Status, r.Method, r.Host, r.Path,
 		r.Headers, r.Sleep, r.Echo,
 	)
 	hash := sha256.Sum256([]byte(hstr))

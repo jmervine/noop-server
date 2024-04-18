@@ -13,7 +13,7 @@ func NoopClient_FormatRecord(t *testing.T) {
 	f := NoopClient{}
 	rec := record()
 	r := f.FormatRecord(rec)
-	e := fmt.Sprintf(NOOP_CLEINT_TEMPLATE, 1, "GET", "/testing", "Foo:bar", 0)
+	e := fmt.Sprintf(NOOP_CLEINT_TEMPLATE, 1, "GET", "", "/testing", "Foo:bar", 0)
 
 	if r != e {
 		t.Errorf("Expected '%s', got '%s', from '%v'", e, r, rec)

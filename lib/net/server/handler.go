@@ -16,6 +16,9 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 
 	begin := time.Now()
 	record := records.NewRecord(r)
+	if record.Host == "" {
+		record.Host = cfg.RecordHost
+	}
 	if store != nil {
 		store.Add(record)
 	}
