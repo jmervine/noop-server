@@ -13,6 +13,7 @@ import (
 const LOG_TEMPLATE = "on=%s method=%s path=%s status=%d took=%v\n"
 
 type Log struct {
+	Default
 	verbose  bool
 	caller   string
 	duration time.Duration

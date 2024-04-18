@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -60,20 +59,9 @@ func Start(c *config.Config) error {
 		stream = &recorder.StdRecorder{}
 		format := formatter.NoopClient{}
 
-		// TODO: Make StdFormatter#WriteHeader function to handle this for all things.
 		if c.StreamRecord {
 			format.NewLine = true
-
-			head := fmt.Sprintf("# Stream started: %s\n", time.Now().Format("Mon Jan 2 15:04:05 MST 2006"))
-			_, err := file.WriteString(head)
-			if err != nil {
-				return errors.Errorf("error writing to stream file: %v", err)
-			}
-
-			err = file.Sync()
-			if err != nil {
-				return errors.Errorf("error syncing to stream file: %v", err)
-			}
+			stream.WriteTimestamp()
 
 			// To ensure things are flushed correctly
 			defer file.Sync()

@@ -22,6 +22,7 @@ type RecordsFormatter interface {
 	FormatRecordMap(*records.RecordMap) string
 	FormatRecord(records.Record) string
 	FormatHeader(*http.Header) string
+	FormatTimestamp() string
 }
 
 func NewFromString(formatter string) RecordsFormatter {
@@ -56,6 +57,10 @@ func (f Default) FormatHeader(headers *http.Header) string {
 	}
 
 	return commonFormatHeader(headers)
+}
+
+func (f Default) FormatTimestamp() string {
+	return "" // default to no timestamp
 }
 
 // Common - reuse in more than one

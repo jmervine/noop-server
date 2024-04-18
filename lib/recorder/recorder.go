@@ -16,12 +16,22 @@ type Recorder interface {
 	SetWriter(*os.File)
 	WriteOne(records.Record) error
 	WriteAll(*records.RecordMap) error
+	WriteTimestamp()
 }
 
 // This will support anything that implements the 'io.Writer' interface.
 type StdRecorder struct {
 	formatter formatter.RecordsFormatter
 	writer    *os.File
+}
+
+// This is idempotent, and will fail quietly.
+func (r *StdRecorder) WriteTimestamp() {
+	ts := r.formatter.FormatTimestamp()
+	if ts != "" {
+		r.writer.Write([]byte(ts))
+		r.writer.Sync()
+	}
 }
 
 func (r *StdRecorder) SetFormatter(f formatter.RecordsFormatter) {
