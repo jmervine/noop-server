@@ -11,7 +11,9 @@ import (
 
 const ECHO_TEMPLATE = "status='%d %s' method=%s path=%s headers='%v'"
 
-type Echo struct{}
+type Echo struct {
+	Default
+}
 
 func (f Echo) FormatRecordMap(mapped *records.RecordMap) string {
 	return commonFormatRecordMap(f, mapped)

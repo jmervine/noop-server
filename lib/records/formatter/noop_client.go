@@ -13,19 +13,22 @@ import (
 )
 
 // # Format is '{iterations:-1}|{method:-GET}|{endpoint}|{headers:-}|{sleep}
-// TODO: NoopClient needs a host somehow
 const NOOP_CLEINT_TEMPLATE = "%d|%s|%s|%s|%v"
 
 type NoopClient struct {
+	Default
 	NewLine bool
 }
 
 func (f NoopClient) FormatRecordMap(mapped *records.RecordMap) string {
-	return fmt.Sprintf(
-		"# Created: %s\n%s\n",
-		time.Now().Format("Mon Jan 2 15:04:05 MST 2006"),
-		commonFormatRecordMap(f, mapped),
-	)
+	out := commonFormatRecordMap(f, mapped)
+
+	ts := f.FormatTimestamp()
+	if ts != "" {
+		out = ts + out
+	}
+
+	return out + "\n"
 }
 
 func (f NoopClient) FormatRecord(r records.Record) string {
@@ -51,4 +54,8 @@ func (f NoopClient) FormatHeader(headers *http.Header) string {
 	}
 
 	return commonFormatHeader(headers)
+}
+
+func (f NoopClient) FormatTimestamp() string {
+	return fmt.Sprintf("# Started: %s\n", time.Now().Format("Mon Jan 2 15:04:05 MST 2006"))
 }

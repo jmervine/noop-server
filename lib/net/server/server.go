@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -59,47 +58,38 @@ func Start(c *config.Config) error {
 
 		stream = &recorder.StdRecorder{}
 		format := formatter.NoopClient{}
+		format.NewLine = c.StreamRecord
 
-		// TODO: Make StdFormatter#WriteHeader function to handle this for all things.
+		stream.SetFormatter(format)
+		stream.SetWriter(file)
+
 		if c.StreamRecord {
-			format.NewLine = true
-
-			head := fmt.Sprintf("# Stream started: %s\n", time.Now().Format("Mon Jan 2 15:04:05 MST 2006"))
-			_, err := file.WriteString(head)
-			if err != nil {
-				return errors.Errorf("error writing to stream file: %v", err)
-			}
-
-			err = file.Sync()
-			if err != nil {
-				return errors.Errorf("error syncing to stream file: %v", err)
-			}
+			stream.WriteTimestamp()
 
 			// To ensure things are flushed correctly
 			defer file.Sync()
 		}
 
-		// Call after writing the header to make sure 'file' is available
-		stream.SetFormatter(format)
-		stream.SetWriter(file)
-	}
+		if c.Record {
+			sigChan := make(chan os.Signal, 1)
+			signal.Notify(sigChan, syscall.SIGINT, syscall.SIGHUP)
+			go func() {
+				// As currently designed SIGHUP will record only, without stopping the
+				// server. SIGINT will record and exit.
+				sig := <-sigChan
 
-	if c.Record {
-		sigChan := make(chan os.Signal, 1)
-		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGHUP)
-		go func() {
-			// As currently designed SIGHUP will record only, without stopping the
-			// server. SIGINT will record and exit.
-			sig := <-sigChan
+				store := records.GetStore()
 
-			store := records.GetStore()
-			log.Printf("on=server.Start record-target='%s' record-count=%d\n", c.RecordTarget, store.Size())
-			stream.WriteAll(store)
+				log.Printf("on=server.Start record-target='%s' record-count=%d request-count=%d\n",
+					c.RecordTarget, store.Size(), store.Iterations())
 
-			if sig == syscall.SIGINT {
-				os.Exit(0)
-			}
-		}()
+				stream.WriteAll(store)
+
+				if sig == syscall.SIGINT {
+					os.Exit(0)
+				}
+			}()
+		}
 	}
 
 	if c.TLSEnabled() {

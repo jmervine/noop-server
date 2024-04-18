@@ -40,8 +40,6 @@ func (rm *RecordMap) Snapshot() map[string]Record {
 	return rm.store
 }
 
-// TODO Consider adding RecordMap#Each, currently no use for it
-
 // This function is only used for testing, making private.
 // It should be tested in both fetch and read and fetch and
 // write conditions before being made public.
@@ -56,6 +54,18 @@ func (rm *RecordMap) Size() int {
 	unlock := rm.rLocker()
 	defer unlock()
 	return len(rm.store)
+}
+
+func (rm *RecordMap) Iterations() int {
+	unlock := rm.rLocker()
+	defer unlock()
+	var i int
+
+	for _, val := range rm.store {
+		i += val.Iterations
+	}
+
+	return i
 }
 
 func (rm *RecordMap) rwLocker() func() {
