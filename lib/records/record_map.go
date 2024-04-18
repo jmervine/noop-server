@@ -40,8 +40,6 @@ func (rm *RecordMap) Snapshot() map[string]Record {
 	return rm.store
 }
 
-// TODO Consider adding RecordMap#Each, currently no use for it
-
 // This function is only used for testing, making private.
 // It should be tested in both fetch and read and fetch and
 // write conditions before being made public.

@@ -41,7 +41,7 @@ func TestRecord_NewRecord(t *testing.T) {
 
 	defHost := "localhost:3000"
 
-	record := NewRecord(request, defHost, nil)
+	record := NewRecord(request, defHost)
 
 	if record.Iterations != 1 {
 		t.Error("Expected record.Iterations to be 1, got", record.Iterations)
@@ -80,7 +80,7 @@ func TestRecord_NewRecord_withRequestHost(t *testing.T) {
 	request := &http.Request{
 		Host: "https://host.test.host",
 	}
-	record := NewRecord(request, "", nil)
+	record := NewRecord(request, "")
 
 	if record.endpoint.Scheme != "https" {
 		t.Error("Expected record.endpoint.Schmeme to be https, got", record.endpoint.Scheme)
@@ -93,7 +93,7 @@ func TestRecord_NewRecord_withRequestHost(t *testing.T) {
 
 func TestRecord_NewRecord_withDefaultHost(t *testing.T) {
 	request := &http.Request{}
-	record := NewRecord(request, "https://default.test.host:3333", nil)
+	record := NewRecord(request, "https://default.test.host:3333")
 
 	if record.endpoint.Scheme != "https" {
 		t.Error("Expected record.endpoint.Schmeme to be https, got", record.endpoint.Scheme)
