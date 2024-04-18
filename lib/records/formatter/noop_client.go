@@ -13,7 +13,6 @@ import (
 )
 
 // # Format is '{iterations:-1}|{method:-GET}|{endpoint}|{headers:-}|{sleep}
-// TODO: NoopClient needs a host somehow
 const NOOP_CLEINT_TEMPLATE = "%d|%s|%s|%s|%v"
 
 type NoopClient struct {
