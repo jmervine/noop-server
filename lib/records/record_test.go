@@ -2,6 +2,7 @@ package records
 
 import (
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 )
@@ -17,8 +18,11 @@ func emptyRecord() Record {
 
 func fullRecord() Record {
 	r := emptyRecord()
-	r.Endpoint = "http://www.example.com"
+
+	e, _ := url.Parse("http://www.example.com")
+	r.endpoint = e
 	r.Method = "GET"
+
 	return r
 }
 
@@ -92,9 +96,10 @@ func TestRecord_parseSleep(t *testing.T) {
 }
 
 func TestRecord_hash(t *testing.T) {
-	r1 := Record{Status: 200, Endpoint: "http://localhost/foo1"}
-	r2 := Record{Status: 200, Endpoint: "http://localhost/foo1"}
-	r3 := Record{Status: 300, Endpoint: "http://localhost/foo1"}
+	e, _ := url.Parse("http://localhost/foo1")
+	r1 := Record{Status: 200, endpoint: e}
+	r2 := Record{Status: 200, endpoint: e}
+	r3 := Record{Status: 300, endpoint: e}
 
 	if r1.hash() != r2.hash() {
 		t.Error("Expected r1 and r1 to have the same hash")

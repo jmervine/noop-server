@@ -125,13 +125,6 @@ func Init(args []string) (*Config, error) {
 			Value:       DEFAULT_RECORD_TARGET,
 			Destination: &c.RecordTarget,
 		},
-		&cli.StringFlag{
-			Name:        "record-host",
-			Aliases:     []string{"H"},
-			Usage:       "Sets host for recorder",
-			Value:       "",
-			Destination: &c.RecordHost,
-		},
 	}
 	app.Action = func(_ *cli.Context) error {
 		return nil
