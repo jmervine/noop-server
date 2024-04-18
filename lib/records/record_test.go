@@ -36,6 +36,7 @@ func TestRecord_NewRecord(t *testing.T) {
 			Path:   "/testing",
 		},
 		Header: headers,
+		Host:   "host.test.host",
 	}
 
 	defHost := "localhost:3000"
