@@ -76,6 +76,26 @@ func TestRecord_NewRecord(t *testing.T) {
 	}
 }
 
+func TestRecord_NewRecord_withRequestHost(t *testing.T) {
+	request := &http.Request{
+		Host: "http://host.test.host",
+	}
+	record := NewRecord(request, "", nil)
+
+	if record.endpoint.Host != "host.test.host" {
+		t.Error("Expected record.endpoint.Host to be host.test.host, got", record.endpoint.Host)
+	}
+}
+
+func TestRecord_NewRecord_withDefaultHost(t *testing.T) {
+	request := &http.Request{}
+	record := NewRecord(request, "http://default.test.host", nil)
+
+	if record.endpoint.Host != "default.test.host" {
+		t.Error("Expected record.endpoint.Host to be default.test.host, got", record.endpoint.Host)
+	}
+}
+
 func TestRecord_Endpoint(t *testing.T) {
 	rec := fullRecord()
 	exp := "http://www.example.com"

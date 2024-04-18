@@ -2,6 +2,7 @@ default: test build
 
 .PHONY: test
 test:
+	go clean -testcache
 	go test -race ./...
 
 .PHONY: build

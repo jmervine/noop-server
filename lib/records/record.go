@@ -185,7 +185,9 @@ func (r *Record) setEndpoint(req *http.Request, defHost string) {
 
 	reqParse, reqErr := url.Parse(req.Host)
 	if reqErr == nil && reqParse != nil {
-		r.endpoint.Scheme = reqParse.Scheme
+		if reqParse.Scheme != "" {
+			r.endpoint.Scheme = reqParse.Scheme
+		}
 		r.endpoint.Host = reqParse.Host
 	}
 
