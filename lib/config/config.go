@@ -27,7 +27,6 @@ type Config struct {
 	StreamRecord bool
 	Record       bool
 	RecordTarget string
-	RecordHost   string
 }
 
 func Init(args []string) (*Config, error) {
