@@ -78,9 +78,13 @@ func TestRecord_NewRecord(t *testing.T) {
 
 func TestRecord_NewRecord_withRequestHost(t *testing.T) {
 	request := &http.Request{
-		Host: "http://host.test.host",
+		Host: "https://host.test.host",
 	}
 	record := NewRecord(request, "", nil)
+
+	if record.endpoint.Scheme != "https" {
+		t.Error("Expected record.endpoint.Schmeme to be https, got", record.endpoint.Scheme)
+	}
 
 	if record.endpoint.Host != "host.test.host" {
 		t.Error("Expected record.endpoint.Host to be host.test.host, got", record.endpoint.Host)
@@ -89,10 +93,14 @@ func TestRecord_NewRecord_withRequestHost(t *testing.T) {
 
 func TestRecord_NewRecord_withDefaultHost(t *testing.T) {
 	request := &http.Request{}
-	record := NewRecord(request, "http://default.test.host", nil)
+	record := NewRecord(request, "https://default.test.host:3333", nil)
 
-	if record.endpoint.Host != "default.test.host" {
-		t.Error("Expected record.endpoint.Host to be default.test.host, got", record.endpoint.Host)
+	if record.endpoint.Scheme != "https" {
+		t.Error("Expected record.endpoint.Schmeme to be https, got", record.endpoint.Scheme)
+	}
+
+	if record.endpoint.Host != "default.test.host:3333" {
+		t.Error("Expected record.endpoint.Host to be default.test.host:3333, got", record.endpoint.Host)
 	}
 }
 
