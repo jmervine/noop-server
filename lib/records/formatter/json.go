@@ -16,6 +16,7 @@ type Json struct {
 }
 
 type JsonRecord struct {
+	Timestamp  string      `json:"timestamp"`
 	Iterations int         `json:"iterations"`
 	Endpoint   string      `json:"endpoint"`
 	Method     string      `json:"method"`
@@ -68,11 +69,21 @@ func (f Json) FormatTimestamp() string {
 	return ""
 }
 
+// Creating this function, so that I can override it during testing.
+// I dislike the pattern of writing addition code for testing, but
+// other options see heavy handed.
+func formattedNow(t time.Time) string {
+	return t.Format("2006-01-02T15:04:05Z07:00")
+}
+
 func jsonFromRecord(rec records.Record) JsonRecord {
+	// Use format RFC3339
+	timestamp := formattedNow(rec.Timestamp)
 	headers := *rec.Headers
 	endpoint := rec.Endpoint()
 
 	return JsonRecord{
+		Timestamp:  timestamp,
 		Iterations: rec.Iterations,
 		Endpoint:   endpoint,
 		Method:     rec.Method,
