@@ -57,8 +57,8 @@ func Start(c *config.Config) error {
 		defer file.Close()
 
 		stream = &recorder.StdRecorder{}
-		format := formatter.NoopClient{}
-		format.NewLine = c.StreamRecord
+		format := cfg.RecordFormatter()
+		format.SetNewline(c.StreamRecord)
 
 		stream.SetFormatter(format)
 		stream.SetWriter(file)

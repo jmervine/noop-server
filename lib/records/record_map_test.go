@@ -37,7 +37,7 @@ func TestRecordMap_Add(t *testing.T) {
 	}
 }
 
-func BenchmarkRecordMapAddOne(b *testing.B) {
+func BenchmarkRecordMap_AddOne(b *testing.B) {
 	rm := GetStore()
 
 	for n := 0; n < b.N; n++ {
@@ -46,7 +46,7 @@ func BenchmarkRecordMapAddOne(b *testing.B) {
 	}
 }
 
-func BenchmarkRecordMapAddMany(b *testing.B) {
+func BenchmarkRecordMap_AddMany(b *testing.B) {
 	rm := GetStore()
 
 	for n := 0; n < b.N; n++ {

@@ -28,7 +28,7 @@ func TestEcho_FormatRecordMap(t *testing.T) {
 	}
 }
 
-func BenchmarkRecordMapAddOne(b *testing.B) {
+func BenchmarkEcho_RecordMap(b *testing.B) {
 	m := recordMap()
 	f := Echo{}
 

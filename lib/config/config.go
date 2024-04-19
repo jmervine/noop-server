@@ -5,13 +5,23 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 
+	"github.com/jmervine/noop-server/lib/records/formatter"
 	"github.com/urfave/cli/v2"
+	"golang.org/x/exp/slices"
 )
 
 const DEFAULT_NAME = "noop-server"
 const DEFAULT_RECORD_TARGET = "record.txt"
 const DEFAULT_RECORD_TARGET_APPEND = ".bak"
+const DEFAULT_RECORD_FORMAT = "noop-client"
+
+var VALID_RECORD_FORMATS = []string{
+	DEFAULT_RECORD_FORMAT,
+	"json",
+}
 
 type Config struct {
 	App  string
@@ -27,6 +37,7 @@ type Config struct {
 	StreamRecord bool
 	Record       bool
 	RecordTarget string
+	recordFormat string
 }
 
 func Init(args []string) (*Config, error) {
@@ -124,8 +135,47 @@ func Init(args []string) (*Config, error) {
 			Value:       DEFAULT_RECORD_TARGET,
 			Destination: &c.RecordTarget,
 		},
+		&cli.StringFlag{
+			Name:        "record-format",
+			Aliases:     []string{"F"},
+			Destination: &c.recordFormat,
+			Value:       DEFAULT_RECORD_FORMAT,
+
+			Usage: fmt.Sprintf(
+				"Record format used when recording results to a file (default: %s)",
+				strings.Join(VALID_RECORD_FORMATS, ", "),
+			),
+		},
 	}
-	app.Action = func(_ *cli.Context) error {
+	app.Action = func(ctx *cli.Context) error {
+		target := ctx.String("record-target")
+
+		// Only do this if the user didn't set a target.
+		if target == DEFAULT_RECORD_TARGET {
+			format := ctx.String("record-format")
+			fmtExt := ""
+			switch format {
+			case "json":
+				fmtExt = ".json"
+			case "csv":
+				fmtExt = ".csv"
+			case "yaml":
+				fmtExt = ".yaml"
+			case "noop-client":
+			default:
+				fmtExt = ".txt"
+			}
+
+			curExt := filepath.Ext(target)
+			if fmtExt != curExt {
+				target = target[0:len(target)-len(curExt)] + fmtExt
+
+				// Change the target in stream
+				ctx.Set("record-target", target)
+			}
+
+		}
+
 		return nil
 	}
 
@@ -145,9 +195,32 @@ func (c Config) validate() error {
 		return errors.New("both record and stream-record flags cannot be set, pick one")
 	}
 
-	// Add more validators here as needed.
+	if !slices.Contains(VALID_RECORD_FORMATS, c.recordFormat) {
+		return fmt.Errorf("unknown value for record format, pick one: %s", strings.Join(VALID_RECORD_FORMATS, ", "))
+	}
 
+	// Add more validators here as needed.
 	return nil
+}
+
+// This function assigns the formatter.RecordsFormatter interface based
+// on what is selected via the CLI.
+func (c *Config) RecordFormatter() formatter.RecordsFormatter {
+	var format formatter.RecordsFormatter
+	format = &formatter.Default{}
+
+	switch c.recordFormat {
+	case "noop-client":
+		format = &formatter.NoopClient{}
+	case "json":
+		format = &formatter.Json{}
+	case "yaml":
+		// TODO: Handle yaml
+	case "csv":
+		// TODO: Handle csv
+	}
+
+	return format
 }
 
 func (c Config) Listener() string {

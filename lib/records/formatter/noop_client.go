@@ -17,7 +17,7 @@ const NOOP_CLEINT_TEMPLATE = "%d|%s|%s|%s|%v"
 
 type NoopClient struct {
 	Default
-	NewLine bool
+	Newline bool
 }
 
 func (f NoopClient) FormatRecordMap(mapped *records.RecordMap) string {
@@ -41,7 +41,7 @@ func (f NoopClient) FormatRecord(r records.Record) string {
 		int64(r.Sleep*time.Millisecond),
 	)
 
-	if f.NewLine {
+	if f.Newline {
 		out = out + "\n"
 	}
 
@@ -58,4 +58,8 @@ func (f NoopClient) FormatHeader(headers *http.Header) string {
 
 func (f NoopClient) FormatTimestamp() string {
 	return fmt.Sprintf("# Started: %s\n", time.Now().Format("Mon Jan 2 15:04:05 MST 2006"))
+}
+
+func (f NoopClient) SetNewline(b bool) {
+	f.Newline = b
 }
