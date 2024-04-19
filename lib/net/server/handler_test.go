@@ -39,7 +39,7 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func BenchmarkGet(b *testing.B) {
+func BenchmarkServer_handlerWithGet(b *testing.B) {
 	old := log.Writer()
 	log.SetOutput(io.Discard)
 	defer func() {

@@ -5,13 +5,22 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
+	"github.com/jmervine/noop-server/lib/records/formatter"
 	"github.com/urfave/cli/v2"
+	"golang.org/x/exp/slices"
 )
 
 const DEFAULT_NAME = "noop-server"
 const DEFAULT_RECORD_TARGET = "record.txt"
 const DEFAULT_RECORD_TARGET_APPEND = ".bak"
+const DEFAULT_RECORD_FORMAT = "noop-client"
+
+var VALID_RECORD_FORMATS = []string{
+	DEFAULT_RECORD_FORMAT,
+	"json",
+}
 
 type Config struct {
 	App  string
@@ -27,6 +36,7 @@ type Config struct {
 	StreamRecord bool
 	Record       bool
 	RecordTarget string
+	recordFormat string
 }
 
 func Init(args []string) (*Config, error) {
@@ -124,6 +134,17 @@ func Init(args []string) (*Config, error) {
 			Value:       DEFAULT_RECORD_TARGET,
 			Destination: &c.RecordTarget,
 		},
+		&cli.StringFlag{
+			Name:        "record-format",
+			Aliases:     []string{"F"},
+			Destination: &c.recordFormat,
+			Value:       DEFAULT_RECORD_FORMAT,
+
+			Usage: fmt.Sprintf(
+				"Record format used when recording results to a file (default: %s)",
+				strings.Join(VALID_RECORD_FORMATS, ", "),
+			),
+		},
 	}
 	app.Action = func(_ *cli.Context) error {
 		return nil
@@ -145,7 +166,25 @@ func (c Config) validate() error {
 		return errors.New("both record and stream-record flags cannot be set, pick one")
 	}
 
+	if !slices.Contains(VALID_RECORD_FORMATS, c.recordFormat) {
+		return fmt.Errorf("unknown value for record format, pick one: %s", strings.Join(VALID_RECORD_FORMATS, ", "))
+	}
+
 	// Add more validators here as needed.
+	return nil
+}
+
+func (c Config) RecordFormatter() formatter.RecordsFormatter {
+	switch c.recordFormat {
+	case "noop-client":
+		return &formatter.NoopClient{}
+	case "json":
+		return &formatter.Json{}
+	case "yaml":
+		return &formatter.Default{}
+	case "csv":
+		return &formatter.Default{}
+	}
 
 	return nil
 }

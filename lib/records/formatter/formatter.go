@@ -19,6 +19,9 @@ const DEFAULT_HEADER_JOIN = ";"
 //   - RecordMap needs to be passed as a pointer to ensure thread
 //     safety.
 type RecordsFormatter interface {
+	// Only used by noop currently, but making available for interface.
+	SetNewline(bool)
+
 	FormatRecordMap(*records.RecordMap) string
 	FormatRecord(records.Record) string
 	FormatHeader(*http.Header) string
@@ -42,6 +45,8 @@ func NewFromString(formatter string) RecordsFormatter {
 }
 
 type Default struct{}
+
+func (f Default) SetNewline(_ bool) {}
 
 func (f Default) FormatRecordMap(mapped *records.RecordMap) string {
 	return commonFormatRecordMap(f, mapped)
