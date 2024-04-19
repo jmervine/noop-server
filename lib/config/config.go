@@ -21,6 +21,7 @@ const DEFAULT_RECORD_FORMAT = "noop-client"
 var VALID_RECORD_FORMATS = []string{
 	DEFAULT_RECORD_FORMAT,
 	"json",
+	"yaml",
 }
 
 type Config struct {
@@ -215,7 +216,7 @@ func (c *Config) RecordFormatter() formatter.RecordsFormatter {
 	case "json":
 		format = &formatter.Json{}
 	case "yaml":
-		// TODO: Handle yaml
+		format = &formatter.Yaml{}
 	case "csv":
 		// TODO: Handle csv
 	}

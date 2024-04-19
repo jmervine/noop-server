@@ -6,6 +6,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/urfave/cli/v2 v2.27.1
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
+	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
