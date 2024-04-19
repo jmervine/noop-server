@@ -33,15 +33,19 @@ func (f Json) FormatRecordMap(mapped *records.RecordMap) string {
 		jrecords = append(jrecords, f.FormatRecord(rec))
 	}
 
-	if f.Newline {
-		for i, jrec := range jrecords {
-			jrecords[i] = fmt.Sprintf("\t%s", jrec)
-		}
-
-		return fmt.Sprintf("[\n%s\n]", strings.Join(jrecords, ",\n"))
+	// TODO: Rethink how "Newline" is provided in formatters.
+	// Perhaps remove it and force it when I need it, though that makes
+	// NoopClient's formatter tricky perhaps.
+	// That said, forcing it here and now...
+	//if f.Newline {
+	for i, jrec := range jrecords {
+		jrecords[i] = fmt.Sprintf("  %s", jrec)
 	}
 
-	return fmt.Sprintf("[%s]", strings.Join(jrecords, ","))
+	return fmt.Sprintf("[\n%s\n]", strings.Join(jrecords, ",\n"))
+	// }
+
+	// return fmt.Sprintf("[%s]", strings.Join(jrecords, ","))
 }
 
 func (f Json) FormatRecord(rec records.Record) string {

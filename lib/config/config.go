@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/jmervine/noop-server/lib/records/formatter"
@@ -146,7 +147,35 @@ func Init(args []string) (*Config, error) {
 			),
 		},
 	}
-	app.Action = func(_ *cli.Context) error {
+	app.Action = func(ctx *cli.Context) error {
+		target := ctx.String("record-target")
+
+		// Only do this if the user didn't set a target.
+		if target == DEFAULT_RECORD_TARGET {
+			format := ctx.String("record-format")
+			fmtExt := ""
+			switch format {
+			case "json":
+				fmtExt = ".json"
+			case "csv":
+				fmtExt = ".csv"
+			case "yaml":
+				fmtExt = ".yaml"
+			case "noop-client":
+			default:
+				fmtExt = ".txt"
+			}
+
+			curExt := filepath.Ext(target)
+			if fmtExt != curExt {
+				target = target[0:len(target)-len(curExt)] + fmtExt
+
+				// Change the target in stream
+				ctx.Set("record-target", target)
+			}
+
+		}
+
 		return nil
 	}
 
@@ -174,19 +203,24 @@ func (c Config) validate() error {
 	return nil
 }
 
-func (c Config) RecordFormatter() formatter.RecordsFormatter {
+// This function assigns the formatter.RecordsFormatter interface based
+// on what is selected via the CLI.
+func (c *Config) RecordFormatter() formatter.RecordsFormatter {
+	var format formatter.RecordsFormatter
+	format = &formatter.Default{}
+
 	switch c.recordFormat {
 	case "noop-client":
-		return &formatter.NoopClient{}
+		format = &formatter.NoopClient{}
 	case "json":
-		return &formatter.Json{}
+		format = &formatter.Json{}
 	case "yaml":
-		return &formatter.Default{}
+		// TODO: Handle yaml
 	case "csv":
-		return &formatter.Default{}
+		// TODO: Handle csv
 	}
 
-	return nil
+	return format
 }
 
 func (c Config) Listener() string {

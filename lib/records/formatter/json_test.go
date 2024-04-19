@@ -33,7 +33,7 @@ func TestJson_FormatRecordMap(t *testing.T) {
 	rmap.Add(rec)
 
 	result := format.FormatRecordMap(rmap)
-	expect := "[{\"iterations\":1,\"endpoint\":\"http://test.host/testing\",\"method\":\"GET\",\"status\":200,\"sleep\":0,\"echo\":false,\"headers\":{\"Foo\":[\"bar\"]}}]"
+	expect := "[\n  {\"iterations\":1,\"endpoint\":\"http://test.host/testing\",\"method\":\"GET\",\"status\":200,\"sleep\":0,\"echo\":false,\"headers\":{\"Foo\":[\"bar\"]}}\n]"
 
 	if result != expect {
 		t.Errorf("Expected:\n%s\nGot:\n%s\n", expect, result)
@@ -42,7 +42,7 @@ func TestJson_FormatRecordMap(t *testing.T) {
 	rec = record()
 	rmap.Add(rec)
 	result = format.FormatRecordMap(rmap)
-	expect = "[{\"iterations\":2,\"endpoint\":\"http://test.host/testing\",\"method\":\"GET\",\"status\":200,\"sleep\":0,\"echo\":false,\"headers\":{\"Foo\":[\"bar\"]}}]"
+	expect = "[\n  {\"iterations\":2,\"endpoint\":\"http://test.host/testing\",\"method\":\"GET\",\"status\":200,\"sleep\":0,\"echo\":false,\"headers\":{\"Foo\":[\"bar\"]}}\n]"
 
 	if result != expect {
 		t.Errorf("Expected:\n%s\nGot:\n%s\n", expect, result)
@@ -52,23 +52,8 @@ func TestJson_FormatRecordMap(t *testing.T) {
 	rec.Status = 300
 	rmap.Add(rec)
 	result = format.FormatRecordMap(rmap)
-	expect = "[{\"iterations\":2,\"endpoint\":\"http://test.host/testing\",\"method\":\"GET\",\"status\":200,\"sleep\":0,\"echo\":false,\"headers\":{\"Foo\":[\"bar\"]}},"
-	expect += "{\"iterations\":1,\"endpoint\":\"http://test.host/testing\",\"method\":\"GET\",\"status\":300,\"sleep\":0,\"echo\":false,\"headers\":{\"Foo\":[\"bar\"]}}]"
-
-	if result != expect {
-		t.Errorf("Expected:\n%s\nGot:\n%s\n", expect, result)
-	}
-
-	// TODO: Add datestamp to records.Record for ordering when printing.
-	// To avoid sorting issues (for now) I'm going to test pretty formatting with one item, which fails to test parts
-	// of this.
-	rmap = records.NewRecordMap()
-	rmap.Add(rec)
-	format.Newline = true
-	result = format.FormatRecordMap(rmap)
-	expect = `[
-	{"iterations":1,"endpoint":"http://test.host/testing","method":"GET","status":300,"sleep":0,"echo":false,"headers":{"Foo":["bar"]}}
-]`
+	expect = "[\n  {\"iterations\":2,\"endpoint\":\"http://test.host/testing\",\"method\":\"GET\",\"status\":200,\"sleep\":0,\"echo\":false,\"headers\":{\"Foo\":[\"bar\"]}},\n"
+	expect += "  {\"iterations\":1,\"endpoint\":\"http://test.host/testing\",\"method\":\"GET\",\"status\":300,\"sleep\":0,\"echo\":false,\"headers\":{\"Foo\":[\"bar\"]}}\n]"
 
 	if result != expect {
 		t.Errorf("Expected:\n%s\nGot:\n%s\n", expect, result)
