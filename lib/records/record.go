@@ -20,6 +20,7 @@ const DEFAULT_STATUS = http.StatusOK
 const RECORD_HASH_STRING = "status=%d|method=%s|endpoint=%s|header=%#v|sleep=%v|echo=%v"
 
 type Record struct {
+	Timestamp  time.Time
 	Iterations int
 	Headers    *http.Header
 	endpoint   *url.URL // internal holder for raw url struct
@@ -35,6 +36,7 @@ func GetStore() *RecordMap {
 
 func NewRecord(req *http.Request, dHost string) Record {
 	r := Record{}
+	r.Timestamp = time.Now()
 
 	// Because this will parse a single request, the iterations will always be 1
 	// this field exists to be a counter as they're added to Records.
