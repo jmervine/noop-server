@@ -5,15 +5,6 @@ import (
 	"testing"
 )
 
-func BenchmarkEcho_RecordMap(b *testing.B) {
-	m := recordMap()
-	f := Echo{}
-
-	for n := 0; n < b.N; n++ {
-		_ = f.FormatRecordMap(m)
-	}
-}
-
 func TestEcho_FormatRecord(t *testing.T) {
 	f := Echo{}
 	rec := record()

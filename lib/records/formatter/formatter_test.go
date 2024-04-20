@@ -8,6 +8,7 @@ import (
 	"github.com/jmervine/noop-server/lib/records"
 )
 
+// -------------
 // These functions can be used in all formatter tests.
 func recordMap() *records.RecordMap {
 	m := records.NewRecordMap()
@@ -41,6 +42,16 @@ func record() records.Record {
 	return r
 }
 
+func benchmarkRecordMapFor(b *testing.B, f RecordsFormatter) {
+	m := recordMap()
+
+	for n := 0; n < b.N; n++ {
+		_ = f.FormatRecordMap(m)
+	}
+}
+
+// -------------
+
 // Because sorting isn't assured, we have the option to say give me
 // only one header for when we're not actualyl testing header formatting.
 // Otherwise, we'll want two, to make sure that joining is correct, but
@@ -59,6 +70,11 @@ func headers(onlyOne bool) http.Header {
 // formatter and as such, will tested by implemented formatters.
 func TestFormatter_commonFormatRecordMap(t *testing.T) {
 	t.Skip("Skipping this test, as it requires a formatter and as such, will tested by implemented formatters.")
+}
+
+func BenchmarkEcho_FormatRecordMap(b *testing.B) {
+	// This is using Echo to bench commonFormatRecordMap
+	benchmarkRecordMapFor(b, Echo{})
 }
 
 func TestFormatter_commonFormatHeader(t *testing.T) {

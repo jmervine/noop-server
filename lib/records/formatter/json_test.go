@@ -70,19 +70,5 @@ func TestJson_FormatRecordMap(t *testing.T) {
 }
 
 func BenchmarkJson_FormatRecordMap(b *testing.B) {
-	rec := record()
-	format := Json{}
-	rmap := records.NewRecordMap()
-	rmap.Add(rec)
-
-	rec = record()
-	rmap.Add(rec)
-
-	rec = record()
-	rec.Status = 300
-	rmap.Add(rec)
-
-	for n := 0; n < b.N; n++ {
-		format.FormatRecordMap(rmap)
-	}
+	benchmarkRecordMapFor(b, Json{})
 }
