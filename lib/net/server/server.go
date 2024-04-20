@@ -56,15 +56,13 @@ func Start(c *config.Config) error {
 		}
 		defer file.Close()
 
-		stream = &recorder.StdRecorder{}
 		format := cfg.RecordFormatter()
-		format.SetNewline(c.StreamRecord)
-
+		stream = &recorder.StdRecorder{}
 		stream.SetFormatter(format)
 		stream.SetWriter(file)
 
 		if c.StreamRecord {
-			stream.WriteTimestamp()
+			stream.WriteFirstLine()
 
 			// To ensure things are flushed correctly
 			defer file.Sync()

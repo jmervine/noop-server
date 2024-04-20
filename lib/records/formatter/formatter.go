@@ -31,13 +31,10 @@ type CommonRecordSerializer struct {
 //   - RecordMap needs to be passed as a pointer to ensure thread
 //     safety.
 type RecordsFormatter interface {
-	// Only used by noop currently, but making available for interface.
-	SetNewline(bool)
-
 	FormatRecordMap(*records.RecordMap) string
 	FormatRecord(records.Record) string
 	FormatHeader(*http.Header) string
-	FormatTimestamp() string
+	FormatFirstLine() string
 }
 
 func NewFromString(formatter string) RecordsFormatter {
@@ -58,8 +55,6 @@ func NewFromString(formatter string) RecordsFormatter {
 
 type Default struct{}
 
-func (f Default) SetNewline(_ bool) {}
-
 func (f Default) FormatRecordMap(mapped *records.RecordMap) string {
 	return commonFormatRecordMap(f, mapped)
 }
@@ -76,7 +71,7 @@ func (f Default) FormatHeader(headers *http.Header) string {
 	return commonFormatHeader(headers)
 }
 
-func (f Default) FormatTimestamp() string {
+func (f Default) FormatFirstLine() string {
 	return "" // default to no timestamp
 }
 
@@ -89,7 +84,7 @@ func commonFormatRecordMap(f RecordsFormatter, mapped *records.RecordMap) string
 		collect = append(collect, f.FormatRecord(record))
 	}
 
-	return strings.Join(collect, "\n")
+	return strings.Join(collect, "")
 }
 
 func commonFormatHeader(headers *http.Header) string {
@@ -111,7 +106,6 @@ func commonPath(s string) string {
 }
 
 func newCommonSerializer(rec records.Record) CommonRecordSerializer {
-	// Use format RFC3339
 	timestamp := formattedNow(rec.Timestamp)
 	headers := *rec.Headers
 	endpoint := rec.Endpoint()

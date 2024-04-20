@@ -29,10 +29,6 @@ func NewLogFormatter(fn string, dur time.Duration, body io.ReadCloser, v bool) L
 	}
 }
 
-func (f Log) FormatRecordMap(mapped *records.RecordMap) string {
-	return commonFormatRecordMap(f, mapped)
-}
-
 func (f Log) FormatRecord(r records.Record) string {
 	path := commonPath(r.Path())
 

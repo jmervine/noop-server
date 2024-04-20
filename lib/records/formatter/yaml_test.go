@@ -22,7 +22,7 @@ method: GET
 status: 200
 sleep: 0
 echo: false
-headers: {Foo: [bar]}
+headers: {"Foo":["bar"]}
 `
 
 	if result != expect {
@@ -48,14 +48,16 @@ func TestYaml_FormatRecordMap(t *testing.T) {
 	rmap.Add(rec)
 
 	result := format.FormatRecordMap(rmap)
-	expect := `- timestamp: "` + nf + `"
+	expect := `# Started: ` + now.Format("Mon Jan 2 15:04:05 MST 2006") + `
+---
+- timestamp: "` + nf + `"
   iterations: 1
   endpoint: http://test.host/testing
   method: GET
   status: 200
   sleep: 0
   echo: false
-  headers: {Foo: [bar]}
+  headers: {"Foo":["bar"]}
 `
 
 	if result != expect {

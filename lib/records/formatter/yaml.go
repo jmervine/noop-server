@@ -1,11 +1,16 @@
+// formatter/yaml
+// The yaml formatting libs found were slow and this is a perscritive output,
+// we're going to just write out what we want instead of using a Marshal fn.
 package formatter
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/jmervine/noop-server/lib/records"
-	"gopkg.in/yaml.v2"
 )
 
 type Yaml struct {
@@ -14,37 +19,60 @@ type Yaml struct {
 }
 
 func (f Yaml) FormatRecordMap(mapped *records.RecordMap) string {
+	template := `- timestamp: "%s"
+  iterations: %d
+  endpoint: %s
+  method: %s
+  status: %d
+  sleep: %d
+  echo: %v
+  headers: %s
+`
+
 	snapshot := mapped.Snapshot()
-	recs := []CommonRecordSerializer{}
+	recs := []string{}
 
 	for _, rec := range snapshot {
-		recs = append(recs, newCommonSerializer(rec))
+		r := newCommonSerializer(rec)
+		new := fmt.Sprintf(
+			template, r.Timestamp, r.Iterations, r.Endpoint, r.Method,
+			r.Status, r.Sleep, r.Echo, f.FormatHeader(&r.Headers),
+		)
+		recs = append(recs, new)
 	}
 
-	b, err := yaml.Marshal(recs)
-	if err != nil {
-		return fmt.Sprintf("---\nerror: %s\n", err)
-	}
-
-	return string(b[:])
+	return f.FormatFirstLine() + strings.Join(recs, "\n")
 }
 
 func (f Yaml) FormatRecord(rec records.Record) string {
+	template := `timestamp: "%s"
+iterations: %d
+endpoint: %s
+method: %s
+status: %d
+sleep: %d
+echo: %v
+headers: %s
+`
+
 	r := newCommonSerializer(rec)
-	b, err := yaml.Marshal(r)
+	return fmt.Sprintf(
+		template, r.Timestamp, r.Iterations, r.Endpoint, r.Method,
+		r.Status, r.Sleep, r.Echo, f.FormatHeader(&r.Headers),
+	)
+}
+
+func (y Yaml) FormatHeader(headers *http.Header) string {
+	// Because json.Marshal is very fast, and this result is more fluid we are
+	// going to use it here.
+	b, err := json.Marshal(headers)
 	if err != nil {
-		return fmt.Sprintf("---\nerror: %s\n", err)
+		return fmt.Sprintf("{\"error\": \"when marshaling headers got: %v\",\"headers\":\"%+v\"}\n", err, headers)
 	}
 
 	return string(b[:])
 }
 
-func (f Yaml) FormatHeader(header *http.Header) string {
-	// Unused
-	return ""
-}
-
-func (f Yaml) FormatTimestamp() string {
-	// Unused
-	return ""
+func (f Yaml) FormatFirstLine() string {
+	return fmt.Sprintf("# Started: %s\n---\n", time.Now().Format("Mon Jan 2 15:04:05 MST 2006"))
 }

@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/exp/slices"
 )
 
 const MAX_SLEEP = (15 * time.Second)
@@ -15,6 +17,8 @@ const RECORD_HEADER = "X-Noopserverflags"
 const SPLIT_RECORD_HEADER = ";"
 const SPLIT_HEADER_VALUE = ":"
 const DEFAULT_STATUS = http.StatusOK
+
+var VALID_SCHEMES = []string{"http", "https"}
 
 // Used to create a string for hashing a Record
 const RECORD_HASH_STRING = "status=%d|method=%s|endpoint=%s|header=%#v|sleep=%v|echo=%v"
@@ -168,12 +172,12 @@ func (r *Record) setEndpoint(req *http.Request, defHost string) {
 		return
 	}
 
-	reqParse, reqErr := url.Parse(req.Host)
-	if reqErr == nil && reqParse != nil {
-		if reqParse.Scheme != "" {
-			r.endpoint.Scheme = reqParse.Scheme
+	hParse, hErr := url.Parse(req.Host)
+	if hErr == nil && hParse != nil {
+		if slices.Contains(VALID_SCHEMES, hParse.Scheme) {
+			r.endpoint.Scheme = hParse.Scheme
 		}
-		r.endpoint.Host = reqParse.Host
+		r.endpoint.Host = hParse.Host
 	}
 
 	if r.endpoint.Host != "" {
