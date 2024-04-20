@@ -46,7 +46,6 @@ func Start(c *config.Config) error {
 		addMTLSSupportToServer(svr, c.CertCAPath)
 	}
 
-	// TODO: Consider remove all recorder handling in net/server to recorder.
 	if c.Recording() {
 		store = records.GetStore()
 

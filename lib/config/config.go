@@ -115,7 +115,6 @@ func Init(args []string) (*Config, error) {
 			EnvVars:     []string{"MTLS_CA_CHAIN_PATH"},
 			Destination: &c.CertCAPath,
 		},
-		// TODO: Support record formats: noop-client,csv,json,yaml
 		&cli.BoolFlag{
 			Name:        "record",
 			Aliases:     []string{"r"},
