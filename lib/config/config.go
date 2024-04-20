@@ -21,6 +21,8 @@ const DEFAULT_RECORD_FORMAT = "noop-client"
 var VALID_RECORD_FORMATS = []string{
 	DEFAULT_RECORD_FORMAT,
 	"json",
+	"yaml",
+	"csv",
 }
 
 type Config struct {
@@ -113,7 +115,6 @@ func Init(args []string) (*Config, error) {
 			EnvVars:     []string{"MTLS_CA_CHAIN_PATH"},
 			Destination: &c.CertCAPath,
 		},
-		// TODO: Support record formats: noop-client,csv,json,yaml
 		&cli.BoolFlag{
 			Name:        "record",
 			Aliases:     []string{"r"},
@@ -153,7 +154,7 @@ func Init(args []string) (*Config, error) {
 		// Only do this if the user didn't set a target.
 		if target == DEFAULT_RECORD_TARGET {
 			format := ctx.String("record-format")
-			fmtExt := ""
+			fmtExt := ".txt"
 			switch format {
 			case "json":
 				fmtExt = ".json"
@@ -161,9 +162,8 @@ func Init(args []string) (*Config, error) {
 				fmtExt = ".csv"
 			case "yaml":
 				fmtExt = ".yaml"
-			case "noop-client":
-			default:
-				fmtExt = ".txt"
+			case "noop-client": // use default
+			default: // use default
 			}
 
 			curExt := filepath.Ext(target)
@@ -215,9 +215,9 @@ func (c *Config) RecordFormatter() formatter.RecordsFormatter {
 	case "json":
 		format = &formatter.Json{}
 	case "yaml":
-		// TODO: Handle yaml
+		format = &formatter.Yaml{}
 	case "csv":
-		// TODO: Handle csv
+		format = &formatter.Csv{}
 	}
 
 	return format
@@ -245,7 +245,7 @@ func (c Config) ToString() string {
 		c.Addr, c.Port, c.MTLSEnabled(), c.TLSEnabled(), c.Verbose, c.Record)
 
 	if c.Record {
-		out += fmt.Sprintf(" record-target='%s'", c.RecordTarget)
+		out += fmt.Sprintf(" record-target='%s' record-format=%s", c.RecordTarget, c.recordFormat)
 	}
 
 	return out

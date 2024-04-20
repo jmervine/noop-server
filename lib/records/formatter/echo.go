@@ -15,10 +15,6 @@ type Echo struct {
 	Default
 }
 
-func (f Echo) FormatRecordMap(mapped *records.RecordMap) string {
-	return commonFormatRecordMap(f, mapped)
-}
-
 func (f Echo) FormatRecord(r records.Record) string {
 	path := commonPath(r.Path())
 
@@ -30,12 +26,4 @@ func (f Echo) FormatRecord(r records.Record) string {
 		path,
 		f.FormatHeader(r.Headers),
 	)
-}
-
-func (f Echo) FormatHeader(headers *http.Header) string {
-	if headers == nil {
-		return ""
-	}
-
-	return commonFormatHeader(headers)
 }

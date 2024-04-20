@@ -21,18 +21,11 @@ type NoopClient struct {
 }
 
 func (f NoopClient) FormatRecordMap(mapped *records.RecordMap) string {
-	out := commonFormatRecordMap(f, mapped)
-
-	ts := f.FormatTimestamp()
-	if ts != "" {
-		out = ts + out
-	}
-
-	return out + "\n"
+	return f.FormatFirstLine() + commonFormatRecordMap(f, mapped) + "\n"
 }
 
 func (f NoopClient) FormatRecord(r records.Record) string {
-	out := fmt.Sprintf(
+	return fmt.Sprintf(
 		NOOP_CLEINT_TEMPLATE,
 		r.Iterations,
 		r.Method,
@@ -40,12 +33,6 @@ func (f NoopClient) FormatRecord(r records.Record) string {
 		f.FormatHeader(r.Headers),
 		int64(r.Sleep*time.Millisecond),
 	)
-
-	if f.Newline {
-		out = out + "\n"
-	}
-
-	return out
 }
 
 func (f NoopClient) FormatHeader(headers *http.Header) string {
@@ -56,10 +43,6 @@ func (f NoopClient) FormatHeader(headers *http.Header) string {
 	return commonFormatHeader(headers)
 }
 
-func (f NoopClient) FormatTimestamp() string {
+func (f NoopClient) FormatFirstLine() string {
 	return fmt.Sprintf("# Started: %s\n", time.Now().Format("Mon Jan 2 15:04:05 MST 2006"))
-}
-
-func (f NoopClient) SetNewline(b bool) {
-	f.Newline = b
 }

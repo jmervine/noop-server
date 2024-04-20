@@ -46,7 +46,6 @@ func Start(c *config.Config) error {
 		addMTLSSupportToServer(svr, c.CertCAPath)
 	}
 
-	// TODO: Consider remove all recorder handling in net/server to recorder.
 	if c.Recording() {
 		store = records.GetStore()
 
@@ -56,15 +55,13 @@ func Start(c *config.Config) error {
 		}
 		defer file.Close()
 
-		stream = &recorder.StdRecorder{}
 		format := cfg.RecordFormatter()
-		format.SetNewline(c.StreamRecord)
-
+		stream = &recorder.StdRecorder{}
 		stream.SetFormatter(format)
 		stream.SetWriter(file)
 
 		if c.StreamRecord {
-			stream.WriteTimestamp()
+			stream.WriteFirstLine()
 
 			// To ensure things are flushed correctly
 			defer file.Sync()

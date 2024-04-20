@@ -28,6 +28,7 @@ func handlerFunc(w http.ResponseWriter, r *http.Request) {
 	// Stream record to record file, if stream enabled
 	if cfg.StreamRecord {
 		stream.WriteOne(record)
+		stream.WriteString("\n")
 	}
 
 	record.DoSleep() // Only sleeps if sleep is set

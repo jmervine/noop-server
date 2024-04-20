@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/jmervine/noop-server/lib/records"
 )
@@ -15,17 +16,25 @@ import (
 const DEFAULT_HEADER_TEMPLATE = "%s:%s"
 const DEFAULT_HEADER_JOIN = ";"
 
+type CommonRecordSerializer struct {
+	Timestamp  string      `json:"timestamp" yaml:"timestamp"`
+	Iterations int         `json:"iterations" yaml:"iterations"`
+	Endpoint   string      `json:"endpoint" yaml:"endpoint"`
+	Method     string      `json:"method" yaml:"method"`
+	Status     int         `json:"status" yaml:"status"`
+	Sleep      int         `json:"sleep" yaml:"sleep"`
+	Echo       bool        `json:"echo" yaml:"echo"`
+	Headers    http.Header `json:"headers" yaml:"headers,omitempty,flow"`
+}
+
 // RecordFormatter interface
 //   - RecordMap needs to be passed as a pointer to ensure thread
 //     safety.
 type RecordsFormatter interface {
-	// Only used by noop currently, but making available for interface.
-	SetNewline(bool)
-
 	FormatRecordMap(*records.RecordMap) string
 	FormatRecord(records.Record) string
 	FormatHeader(*http.Header) string
-	FormatTimestamp() string
+	FormatFirstLine() string
 }
 
 func NewFromString(formatter string) RecordsFormatter {
@@ -46,8 +55,6 @@ func NewFromString(formatter string) RecordsFormatter {
 
 type Default struct{}
 
-func (f Default) SetNewline(_ bool) {}
-
 func (f Default) FormatRecordMap(mapped *records.RecordMap) string {
 	return commonFormatRecordMap(f, mapped)
 }
@@ -64,7 +71,7 @@ func (f Default) FormatHeader(headers *http.Header) string {
 	return commonFormatHeader(headers)
 }
 
-func (f Default) FormatTimestamp() string {
+func (f Default) FormatFirstLine() string {
 	return "" // default to no timestamp
 }
 
@@ -77,7 +84,7 @@ func commonFormatRecordMap(f RecordsFormatter, mapped *records.RecordMap) string
 		collect = append(collect, f.FormatRecord(record))
 	}
 
-	return strings.Join(collect, "\n")
+	return strings.Join(collect, "")
 }
 
 func commonFormatHeader(headers *http.Header) string {
@@ -96,4 +103,26 @@ func commonPath(s string) string {
 		return parsed.Path
 	}
 	return ""
+}
+
+func newCommonSerializer(rec records.Record) CommonRecordSerializer {
+	timestamp := formattedNow(rec.Timestamp)
+	headers := *rec.Headers
+	endpoint := rec.Endpoint()
+
+	return CommonRecordSerializer{
+		Timestamp:  timestamp,
+		Iterations: rec.Iterations,
+		Endpoint:   endpoint,
+		Method:     rec.Method,
+		Status:     rec.Status,
+		Sleep:      int(rec.Sleep * time.Millisecond),
+		Echo:       rec.Echo,
+		Headers:    headers,
+	}
+}
+
+func formattedNow(t time.Time) string {
+	// Format using RFC3339Nano
+	return t.Format("2006-01-02T15:04:05.999999999Z07:00")
 }

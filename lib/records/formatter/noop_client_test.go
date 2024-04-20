@@ -20,6 +20,10 @@ func TestNoopClient_FormatRecord(t *testing.T) {
 	}
 }
 
+func BenchmarkNoopClient_FormatRecord(b *testing.B) {
+	benchmarkRecordFor(b, NoopClient{})
+}
+
 func TestNoopClient_FormatHeaderTest(t *testing.T) {
 	t.Skip("This uses a common formatter from 'formatter' which is already tested.")
 }
