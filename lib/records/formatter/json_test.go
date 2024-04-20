@@ -23,11 +23,7 @@ func TestJson_FormatRecord(t *testing.T) {
 }
 
 func BenchmarkJson_FormatRecord(b *testing.B) {
-	rec := record()
-	format := Json{}
-	for n := 0; n < b.N; n++ {
-		format.FormatRecord(rec)
-	}
+	benchmarkRecordFor(b, Json{})
 }
 
 func TestJson_FormatRecordMap(t *testing.T) {

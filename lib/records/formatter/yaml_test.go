@@ -31,11 +31,7 @@ headers: {"Foo":["bar"]}
 }
 
 func BenchmarkYaml_FormatRecord(b *testing.B) {
-	rec := record()
-	format := Yaml{}
-	for n := 0; n < b.N; n++ {
-		format.FormatRecord(rec)
-	}
+	benchmarkRecordFor(b, Yaml{})
 }
 
 func TestYaml_FormatRecordMap(t *testing.T) {

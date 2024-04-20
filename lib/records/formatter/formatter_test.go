@@ -50,6 +50,14 @@ func benchmarkRecordMapFor(b *testing.B, f RecordsFormatter) {
 	}
 }
 
+func benchmarkRecordFor(b *testing.B, f RecordsFormatter) {
+	r := record()
+
+	for n := 0; n < b.N; n++ {
+		_ = f.FormatRecord(r)
+	}
+}
+
 // -------------
 
 // Because sorting isn't assured, we have the option to say give me

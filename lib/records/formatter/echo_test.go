@@ -16,6 +16,10 @@ func TestEcho_FormatRecord(t *testing.T) {
 	}
 }
 
+func BenchmarkEcho_FormatRecord(b *testing.B) {
+	benchmarkRecordFor(b, Echo{})
+}
+
 func TestEcho_FormatHeaderTest(t *testing.T) {
 	t.Skip("This uses a common formatter from 'formatter' which is already tested.")
 }

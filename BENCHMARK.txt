@@ -4,30 +4,34 @@ goos: darwin
 goarch: amd64
 pkg: github.com/jmervine/noop-server/lib/net/server
 cpu: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
-BenchmarkServer_handlerWithGet-16    	    4126	    244223 ns/op	   28185 B/op	     151 allocs/op
+BenchmarkServer_handlerWithGet-16    	    4981	    299800 ns/op	   28064 B/op	     151 allocs/op
 PASS
-ok  	github.com/jmervine/noop-server/lib/net/server	1.316s
+ok  	github.com/jmervine/noop-server/lib/net/server	2.859s
 PASS
-ok  	github.com/jmervine/noop-server/lib/recorder	0.182s
+ok  	github.com/jmervine/noop-server/lib/recorder	0.166s
 goos: darwin
 goarch: amd64
 pkg: github.com/jmervine/noop-server/lib/records
 cpu: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
-BenchmarkRecordMap_AddOne-16                	  614907	      1807 ns/op	     656 B/op	      14 allocs/op
-BenchmarkRecordMap_AddMany-16               	  673926	      1862 ns/op	     656 B/op	      14 allocs/op
-BenchmarkRecord_parseValuesFromHeader-16    	33881125	        35.72 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRecord_hash-16                     	  626335	      1816 ns/op	     656 B/op	      14 allocs/op
+BenchmarkRecordMap_AddOne-16                	  575504	      1827 ns/op	     656 B/op	      14 allocs/op
+BenchmarkRecordMap_AddMany-16               	  613197	      1871 ns/op	     656 B/op	      14 allocs/op
+BenchmarkRecord_parseValuesFromHeader-16    	30632362	        37.38 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRecord_hash-16                     	  556254	      1881 ns/op	     656 B/op	      14 allocs/op
 PASS
-ok  	github.com/jmervine/noop-server/lib/records	4.980s
+ok  	github.com/jmervine/noop-server/lib/records	5.657s
 goos: darwin
 goarch: amd64
 pkg: github.com/jmervine/noop-server/lib/records/formatter
 cpu: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
-BenchmarkCsv-16                     	  500043	      2257 ns/op	     864 B/op	      34 allocs/op
-BenchmarkEcho_FormatRecordMap-16    	 2311645	       514.4 ns/op	     128 B/op	       8 allocs/op
-BenchmarkJson_FormatRecord-16       	  992686	      1226 ns/op	     712 B/op	      12 allocs/op
-BenchmarkJson_FormatRecordMap-16    	  362413	      3348 ns/op	    2691 B/op	      34 allocs/op
-BenchmarkYaml_FormatRecord-16       	  891313	      1341 ns/op	     600 B/op	      17 allocs/op
-BenchmarkYaml_FormatRecordMap-16    	  323521	      3700 ns/op	    2194 B/op	      42 allocs/op
+BenchmarkCsv-16                        	  425304	      2397 ns/op	     880 B/op	      34 allocs/op
+BenchmarkCsv_FormatRecord-16           	 1000000	      1016 ns/op	     312 B/op	      15 allocs/op
+BenchmarkEcho_FormatRecord-16          	 1598727	       776.7 ns/op	     328 B/op	      10 allocs/op
+BenchmarkEcho_FormatRecordMap-16       	 2223241	       555.0 ns/op	     128 B/op	       8 allocs/op
+BenchmarkJson_FormatRecord-16          	  910636	      1253 ns/op	     712 B/op	      12 allocs/op
+BenchmarkJson_FormatRecordMap-16       	  346700	      3350 ns/op	    2691 B/op	      34 allocs/op
+BenchmarkLog_FormatRecord-16           	 2517891	       480.4 ns/op	     224 B/op	       4 allocs/op
+BenchmarkNoopClient_FormatRecord-16    	 1625805	       772.9 ns/op	     224 B/op	      12 allocs/op
+BenchmarkYaml_FormatRecord-16          	  848582	      1394 ns/op	     600 B/op	      17 allocs/op
+BenchmarkYaml_FormatRecordMap-16       	  292010	      3826 ns/op	    2194 B/op	      42 allocs/op
 PASS
-ok  	github.com/jmervine/noop-server/lib/records/formatter	8.186s
+ok  	github.com/jmervine/noop-server/lib/records/formatter	15.775s
