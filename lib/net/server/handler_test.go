@@ -22,7 +22,7 @@ func init() {
 }
 
 func TestGet(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(handlerFunc))
+	server := httptest.NewServer(http.HandlerFunc(handlerFunc(0)))
 	defer server.Close()
 
 	resp, err := tclient.Get(server.URL)
@@ -46,7 +46,7 @@ func BenchmarkServer_handlerWithGet(b *testing.B) {
 		log.SetOutput(old)
 	}()
 
-	server := httptest.NewServer(http.HandlerFunc(handlerFunc))
+	server := httptest.NewServer(http.HandlerFunc(handlerFunc(0)))
 
 	for n := 0; n < b.N; n++ {
 		_, err := http.Get(server.URL)
@@ -57,7 +57,7 @@ func BenchmarkServer_handlerWithGet(b *testing.B) {
 }
 
 func TestPost(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(handlerFunc))
+	server := httptest.NewServer(http.HandlerFunc(handlerFunc(0)))
 	defer server.Close()
 
 	resp, err := tclient.Post(server.URL, "text/html", nil)
@@ -76,7 +76,7 @@ func TestPost(t *testing.T) {
 }
 
 func TestStatusCode(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(handlerFunc))
+	server := httptest.NewServer(http.HandlerFunc(handlerFunc(0)))
 	defer server.Close()
 
 	req, err := http.NewRequest("GET", server.URL, nil)
