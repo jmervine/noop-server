@@ -3,9 +3,7 @@ package server
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"net"
 	"net/http"
-	"time"
 )
 
 func addMTLSSupportToServer(server *http.Server, ca string) {
@@ -25,45 +23,19 @@ func addMTLSSupportToServer(server *http.Server, ca string) {
 	server.TLSConfig = tlsConfig
 }
 
-// From: https://gist.github.com/shivakar/cd52b5594d4912fbeb46
-// ---------------------------------------------------------------------------
-// From https://golang.org/src/net/http/server.go
-// tcpKeepAliveListener sets TCP keep-alive timeouts on accepted
-// connections. It's used by ListenAndServe and ListenAndServeTLS so
-// dead TCP connections (e.g. closing laptop mid-download) eventually
-// go away.
-type tcpKeepAliveListener struct {
-	*net.TCPListener
-}
-
-func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {
-	tc, err := ln.AcceptTCP()
-	if err != nil {
-		return
-	}
-	tc.SetKeepAlive(true)
-	tc.SetKeepAlivePeriod(3 * time.Minute)
-	return tc, nil
-}
-
-func listenAndServeWithTls(server *http.Server, cert string, key string) error {
-	crt, err := tls.X509KeyPair([]byte(cert), []byte(key))
-	if err != nil {
-		return err
-	}
-
+func tlsConfig() (*tls.Config, error) {
 	config := &tls.Config{}
+	if !cfg.TLSEnabled() {
+		return config, nil
+	}
+
+	crt, err := tls.X509KeyPair([]byte(cfg.CertPrivatePath), []byte(cfg.CertKeyPath))
+	if err != nil {
+		return config, err
+	}
+
 	config.NextProtos = []string{"http/1.1"}
 	config.Certificates = make([]tls.Certificate, 1)
 	config.Certificates[0] = crt
-
-	ln, err := net.Listen("tcp", server.Addr)
-	if err != nil {
-		return err
-	}
-
-	tlsListener := tls.NewListener(tcpKeepAliveListener{ln.(*net.TCPListener)},
-		config)
-
-	return server.Serve(tlsListener)
+	return config, nil
 }

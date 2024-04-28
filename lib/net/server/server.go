@@ -2,11 +2,9 @@ package server
 
 import (
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/jmervine/noop-server/lib/config"
 	"github.com/jmervine/noop-server/lib/recorder"
@@ -26,25 +24,6 @@ var stream recorder.Recorder
 
 func Start(c *config.Config) error {
 	cfg = c
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", handlerFunc)
-
-	svr := &http.Server{
-		Addr:    c.Listener(),
-		Handler: mux,
-
-		// Short timeouts -- this should always be fast.
-		// Really these timeouts should be closer to 100us
-		ReadTimeout:       10 * time.Millisecond,
-		WriteTimeout:      10 * time.Millisecond,
-		IdleTimeout:       10 * time.Millisecond,
-		ReadHeaderTimeout: 10 * time.Millisecond,
-	}
-
-	if c.MTLSEnabled() {
-		addMTLSSupportToServer(svr, c.CertCAPath)
-	}
 
 	if c.Recording() {
 		store = records.GetStore()
@@ -89,9 +68,5 @@ func Start(c *config.Config) error {
 		}
 	}
 
-	if c.TLSEnabled() {
-		return listenAndServeWithTls(svr, c.CertPrivatePath, c.CertKeyPath)
-	}
-
-	return svr.ListenAndServe()
+	return multiListenAndServe()
 }

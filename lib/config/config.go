@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/jmervine/noop-server/lib/records/formatter"
@@ -17,6 +19,8 @@ const DEFAULT_NAME = "noop-server"
 const DEFAULT_RECORD_TARGET = "record.txt"
 const DEFAULT_RECORD_TARGET_APPEND = ".bak"
 const DEFAULT_RECORD_FORMAT = "noop-client"
+
+var DEFAULT_MAX_PROCS = int(math.Round(float64(runtime.NumCPU() / 2.0)))
 
 var VALID_RECORD_FORMATS = []string{
 	DEFAULT_RECORD_FORMAT,
@@ -40,6 +44,8 @@ type Config struct {
 	Record       bool
 	RecordTarget string
 	recordFormat string
+
+	maxProcs int
 }
 
 func Init(args []string) (*Config, error) {
@@ -147,6 +153,13 @@ func Init(args []string) (*Config, error) {
 				strings.Join(VALID_RECORD_FORMATS, ", "),
 			),
 		},
+		&cli.IntFlag{
+			Name:        "max-procs",
+			Aliases:     []string{"N"},
+			Usage:       "Server process to spawn",
+			Destination: &c.maxProcs,
+			Value:       DEFAULT_MAX_PROCS,
+		},
 	}
 	app.Action = func(ctx *cli.Context) error {
 		target := ctx.String("record-target")
@@ -223,6 +236,13 @@ func (c *Config) RecordFormatter() formatter.RecordsFormatter {
 	return format
 }
 
+func (c Config) MaxProcs() int {
+	if c.maxProcs == 0 {
+		return 1
+	}
+	return c.maxProcs
+}
+
 func (c Config) Listener() string {
 	return fmt.Sprintf("%s:%s", c.Addr, c.Port)
 }
@@ -241,8 +261,8 @@ func (c Config) Recording() bool {
 
 func (c Config) ToString() string {
 	out := fmt.Sprintf(
-		"addr=%s port=%s mtls=%v ssl=%v verbose=%v record=%v",
-		c.Addr, c.Port, c.MTLSEnabled(), c.TLSEnabled(), c.Verbose, c.Record)
+		"processes=%d addr=%s port=%s mtls=%v ssl=%v verbose=%v record=%v",
+		c.MaxProcs(), c.Addr, c.Port, c.MTLSEnabled(), c.TLSEnabled(), c.Verbose, c.Record)
 
 	if c.Record {
 		out += fmt.Sprintf(" record-target='%s' record-format=%s", c.RecordTarget, c.recordFormat)
