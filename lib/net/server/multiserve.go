@@ -30,7 +30,8 @@ func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {
 	return tc, nil
 }
 
-func multiListenAndServe() error {
+// Support passing server in for testing, default is to pass nil
+func multiListenAndServe(server *http.Server) error {
 	ln, err := net.Listen("tcp", cfg.Listener())
 	if err != nil {
 		return err
@@ -47,11 +48,18 @@ func multiListenAndServe() error {
 		listener = tls.NewListener(listener, serverConfig)
 	}
 
+	if cfg.MaxProcs() == 1 {
+		log.Println(server.Serve(listener))
+		return nil
+	}
+
 	var wg sync.WaitGroup
 	for i := 0; i < cfg.MaxProcs(); i++ {
 		wg.Add(1)
 		go func(i int) {
-			server := buildServer(i)
+			if server == nil {
+				server = buildServer(i)
+			}
 
 			log.Printf("at=server.Start in=server.multiListenAndServe listener=%03d\n", i)
 			log.Println(server.Serve(listener))

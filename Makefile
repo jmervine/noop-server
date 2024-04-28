@@ -57,4 +57,4 @@ todos:
 .PHONY: benchmark
 benchmark:
 	# This target requires that 'tee' is installed
-	go test -count=1 -benchmem -run='^$$' -bench '^Benchmark.*$$' github.com/jmervine/noop-server/... | tee BENCHMARK.txt
+	go test -count=1 -benchmem -run='^$$' -count=1 -bench '^Benchmark.*$$' github.com/jmervine/noop-server/... | tee BENCHMARK.txt

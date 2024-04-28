@@ -45,7 +45,7 @@ type Config struct {
 	RecordTarget string
 	recordFormat string
 
-	maxProcs int
+	NProcs int
 }
 
 func Init(args []string) (*Config, error) {
@@ -157,7 +157,7 @@ func Init(args []string) (*Config, error) {
 			Name:        "max-procs",
 			Aliases:     []string{"N"},
 			Usage:       "Server process to spawn",
-			Destination: &c.maxProcs,
+			Destination: &c.NProcs,
 			Value:       DEFAULT_MAX_PROCS,
 		},
 	}
@@ -237,10 +237,10 @@ func (c *Config) RecordFormatter() formatter.RecordsFormatter {
 }
 
 func (c Config) MaxProcs() int {
-	if c.maxProcs == 0 {
+	if c.NProcs == 0 {
 		return 1
 	}
-	return c.maxProcs
+	return c.NProcs
 }
 
 func (c Config) Listener() string {

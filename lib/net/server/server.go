@@ -68,5 +68,5 @@ func Start(c *config.Config) error {
 		}
 	}
 
-	return multiListenAndServe()
+	return multiListenAndServe(nil)
 }
