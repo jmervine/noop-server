@@ -208,7 +208,7 @@ func (c Config) validate() error {
 		return errors.New("both record and stream-record flags cannot be set, pick one")
 	}
 
-	if !slices.Contains(VALID_RECORD_FORMATS, c.recordFormat) {
+	if c.recordFormat != "" && !slices.Contains(VALID_RECORD_FORMATS, c.recordFormat) {
 		return fmt.Errorf("unknown value for record format, pick one: %s", strings.Join(VALID_RECORD_FORMATS, ", "))
 	}
 
