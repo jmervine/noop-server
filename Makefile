@@ -18,7 +18,7 @@ bench: benchmark
 .PHONY: docker
 docker:
 	docker build -t jmervine/noop-server:latest .
-	docker tag jmervine/noop-server:latest jmervine/noop-server:$(HEX)
+	docker tag jmervine/noop-server:latest jmervine/noop-server:$(SHA)
 	docker tag jmervine/noop-server:latest jmervine/noop-server:$(VERSION)
 
 .PHONY: release
@@ -27,7 +27,7 @@ release: clean test git/tag docker docker/push
 .PHONY: push
 docker/push: require_owner
 	docker push jmervine/noop-server:latest
-	docker push jmervine/noop-server:$(HEX)
+	docker push jmervine/noop-server:$(SHA)
 	docker push jmervine/noop-server:$(VERSION)
 
 .PHONY: push
