@@ -25,7 +25,7 @@ func (rm *RecordMap) Add(rec Record) {
 	defer unlock()
 
 	if r, ok := rm.store[hash]; ok {
-		r.Iterations++
+		r.Iterations += r.Iterations
 		rm.store[hash] = r
 		return
 	}

@@ -55,3 +55,49 @@ func BenchmarkRecordMap_AddMany(b *testing.B) {
 		rm.Add(rec)
 	}
 }
+
+func TestRecordMap_Size(t *testing.T) {
+	m := NewRecordMap()
+	r1 := fullRecord()
+	r2 := fullRecord()
+
+	m.Add(r1)
+	m.Add(r2)
+
+	if m.Size() != 1 {
+		t.Error("Expected 1, got", m.Size())
+	}
+
+	r3 := fullRecord()
+	r3.Method = "DELETE"
+	m.Add(r3)
+
+	if m.Size() != 2 {
+		t.Error("Expected 2, got", m.Size())
+	}
+}
+
+func TestRecordMap_Interations(t *testing.T) {
+	m := NewRecordMap()
+	r1 := fullRecord()
+	r1.Iterations = 5
+
+	r2 := fullRecord()
+	r2.Iterations = 5
+
+	m.Add(r1)
+	m.Add(r2)
+
+	if m.Iterations() != 10 {
+		t.Error("Expected 10, got", m.Iterations())
+	}
+
+	r3 := fullRecord()
+	r3.Iterations = 5
+	r3.Method = "DELETE"
+	m.Add(r3)
+
+	if m.Iterations() != 15 {
+		t.Error("Expected 15, got", m.Iterations())
+	}
+}
