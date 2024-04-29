@@ -1,7 +1,6 @@
 package main
 
 import (
-	gotls "crypto/tls"
 	"fmt"
 	"log"
 	"os"
@@ -10,10 +9,7 @@ import (
 	"github.com/jmervine/noop-server/lib/net/server"
 )
 
-var (
-	cfg  *config.Config
-	cert gotls.Certificate
-)
+var cfg *config.Config
 
 func init() {
 	log.SetOutput(os.Stdout)
@@ -22,7 +18,7 @@ func init() {
 
 func main() {
 	var err error
-	cfg, err = config.Init(os.Args)
+	cfg, err = config.Init(os.Args, Version)
 
 	if err != nil {
 		log.Fatal(err)

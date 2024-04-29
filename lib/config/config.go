@@ -48,7 +48,7 @@ type Config struct {
 	NProcs int
 }
 
-func Init(args []string) (*Config, error) {
+func Init(args []string, ver string) (*Config, error) {
 	c := new(Config)
 
 	helpPrinter := cli.HelpPrinter
@@ -58,10 +58,11 @@ func Init(args []string) (*Config, error) {
 	}
 
 	app := cli.NewApp()
-
+	app.Version = ver
 	app.Name = DEFAULT_NAME
 	app.Usage = "A simple noop server that accepts everything"
 	app.HideVersion = true
+
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
 			Name:        "name",
@@ -99,7 +100,11 @@ func Init(args []string) (*Config, error) {
 			Required:    false,
 			Destination: &c.Verbose,
 		},
-
+		&cli.BoolFlag{
+			Name:    "version",
+			Aliases: []string{"V"},
+			Usage:   "Show version information",
+		},
 		&cli.StringFlag{
 			Name:        "private",
 			Usage:       "TLS Cert Private file path",
@@ -162,6 +167,12 @@ func Init(args []string) (*Config, error) {
 		},
 	}
 	app.Action = func(ctx *cli.Context) error {
+		version := ctx.Bool("version")
+		if version {
+			fmt.Printf("v%s\n", ver)
+			os.Exit(0)
+		}
+
 		target := ctx.String("record-target")
 
 		// Only do this if the user didn't set a target.
