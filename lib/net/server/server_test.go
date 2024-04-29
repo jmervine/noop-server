@@ -12,7 +12,6 @@ import (
 )
 
 func setupBenchmark(b *testing.B, server *http.Server) func() {
-	b.SetBytes(1000000)
 	cfg = &config.Config{
 		App:    "test-noop-server",
 		Port:   "3333",
