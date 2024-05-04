@@ -38,7 +38,7 @@ func GetStore() *RecordMap {
 	return defaultStore
 }
 
-func NewRecord(req *http.Request, dHost string) Record {
+func NewRecord(req *http.Request, dHost string, sleep time.Duration, echo bool) Record {
 	r := Record{}
 	r.Timestamp = time.Now()
 
@@ -47,7 +47,8 @@ func NewRecord(req *http.Request, dHost string) Record {
 	r.Iterations = 1
 
 	// Ensure defaults
-	r.Sleep = 0
+	r.Sleep = sleep
+	r.Echo = echo
 	r.Status = DEFAULT_STATUS
 
 	// Values from http.Request

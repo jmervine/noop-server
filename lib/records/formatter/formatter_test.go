@@ -34,7 +34,7 @@ func request() *http.Request {
 
 func record() records.Record {
 	req := request()
-	r := records.NewRecord(req, "")
+	r := records.NewRecord(req, "", 0, false)
 	r.Iterations = 1
 	r.Status = http.StatusOK
 	r.Sleep = 0

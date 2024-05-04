@@ -23,7 +23,7 @@ func setupBenchmark(b *testing.B, server *http.Server) func() {
 	log.SetOutput(io.Discard)
 
 	go func() {
-		err := multiListenAndServe(server)
+		err := multiListenAndServe(server, 0)
 		if err != nil {
 			b.Errorf("Expected nil, got: %v", err)
 		}
@@ -40,7 +40,7 @@ func setupBenchmark(b *testing.B, server *http.Server) func() {
 }
 
 func BenchmarkServer(b *testing.B) {
-	server := buildServer(0)
+	server := buildServer(0, 0)
 	closer := setupBenchmark(b, server)
 	defer closer()
 
