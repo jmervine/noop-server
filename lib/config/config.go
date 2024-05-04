@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/jmervine/noop-server/lib/records/formatter"
 	"github.com/urfave/cli/v2"
@@ -46,6 +47,9 @@ type Config struct {
 	recordFormat string
 
 	NProcs int
+
+	Sleep time.Duration
+	Echo  bool
 }
 
 func Init(args []string, ver string) (*Config, error) {
@@ -164,6 +168,20 @@ func Init(args []string, ver string) (*Config, error) {
 			Usage:       "Server process to spawn",
 			Destination: &c.NProcs,
 			Value:       DEFAULT_MAX_PROCS,
+		},
+		&cli.DurationFlag{
+			Name:        "sleep",
+			Aliases:     []string{"S"},
+			Usage:       "Sleep for a period of time before responding",
+			Destination: &c.Sleep,
+			Value:       0,
+		},
+		&cli.BoolFlag{
+			Name:        "echo",
+			Aliases:     []string{"e"},
+			Usage:       "Response to contain details about request",
+			Destination: &c.Echo,
+			Value:       false,
 		},
 	}
 	app.Action = func(ctx *cli.Context) error {

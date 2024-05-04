@@ -16,7 +16,7 @@ func handlerFunc(serverProc int) func(http.ResponseWriter, *http.Request) {
 		defer r.Body.Close()
 
 		begin := time.Now()
-		record := records.NewRecord(r, cfg.Listener())
+		record := records.NewRecord(r, cfg.Listener(), cfg.Sleep, cfg.Echo)
 		if store != nil {
 			store.Add(record)
 		}
