@@ -1,0 +1,5 @@
+---
+"/endpoint*":
+  status: 200
+  sleep: 2000
+  response: "script response"

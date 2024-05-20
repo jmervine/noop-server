@@ -1,0 +1,13 @@
+---
+"/endpoint/1":
+  status: 200
+  sleep: 1000
+  response: Response for endpoint 1
+"/endpoint/2":
+  status: 404
+  response: 404 Not Found on endpoint 2
+"/endpoint/3":
+  status: 200
+  response: '{"oh": "hi"}'
+"/endpoint*":
+  status: 200

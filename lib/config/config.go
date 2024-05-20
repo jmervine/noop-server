@@ -50,6 +50,8 @@ type Config struct {
 
 	Sleep time.Duration
 	Echo  bool
+
+	Script string
 }
 
 func Init(args []string, ver string) (*Config, error) {
@@ -150,6 +152,12 @@ func Init(args []string, ver string) (*Config, error) {
 			Usage:       "Record results to a file",
 			Value:       DEFAULT_RECORD_TARGET,
 			Destination: &c.RecordTarget,
+		},
+		&cli.StringFlag{
+			Name:        "script",
+			Aliases:     []string{"f"},
+			Usage:       "Script to handle responses, if handled ignores response value from headers",
+			Destination: &c.Script,
 		},
 		&cli.StringFlag{
 			Name:        "record-format",

@@ -8,6 +8,10 @@ test:
 	go clean -testcache
 	go test -race ./...
 
+testv:
+	go clean -testcache
+	go test -v -race ./...
+
 .PHONY: benchmark bench
 benchmark:
 	# This target requires that 'tee' is installed
