@@ -10,6 +10,7 @@ import (
 	"github.com/jmervine/noop-server/lib/recorder"
 	"github.com/jmervine/noop-server/lib/records"
 	"github.com/jmervine/noop-server/lib/records/formatter"
+	"github.com/jmervine/noop-server/lib/responder"
 	"github.com/pkg/errors"
 )
 
@@ -21,9 +22,17 @@ var store *records.RecordMap
 
 // For record writer, either stream-record or record
 var stream recorder.Recorder
+var responders *responder.Responders
 
 func Start(c *config.Config) error {
 	cfg = c
+
+	var err error
+	if c.Script != "" {
+		if responders, err = responder.Load(c.Script); err != nil {
+			return err
+		}
+	}
 
 	if c.Recording() {
 		store = records.GetStore()
@@ -68,5 +77,5 @@ func Start(c *config.Config) error {
 		}
 	}
 
-	return multiListenAndServe(nil, cfg.Sleep)
+	return multiListenAndServe(nil)
 }

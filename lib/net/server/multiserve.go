@@ -31,7 +31,7 @@ func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {
 }
 
 // Support passing server in for testing, default is to pass nil
-func multiListenAndServe(server *http.Server, s time.Duration) error {
+func multiListenAndServe(server *http.Server) error {
 	ln, err := net.Listen("tcp", cfg.Listener())
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func multiListenAndServe(server *http.Server, s time.Duration) error {
 		wg.Add(1)
 		go func(i int) {
 			if server == nil {
-				server = buildServer(i, s)
+				server = buildServer(i)
 			}
 
 			log.Printf("at=server.Start in=server.multiListenAndServe listener=%03d\n", i)
@@ -72,20 +72,13 @@ func multiListenAndServe(server *http.Server, s time.Duration) error {
 }
 
 // Server has access to configurations via 'cfg'
-func buildServer(n int, s time.Duration) *http.Server {
+func buildServer(n int) *http.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlerFunc(n))
 
 	server := &http.Server{
 		Addr:    cfg.Listener(),
 		Handler: mux,
-
-		// Short timeouts -- this should always be fast.
-		// Really these timeouts should be closer to 100us
-		ReadTimeout:       (25 * time.Millisecond) + s,
-		WriteTimeout:      (25 * time.Millisecond) + s,
-		IdleTimeout:       (25 * time.Millisecond) + s,
-		ReadHeaderTimeout: (25 * time.Millisecond) + s,
 	}
 
 	if cfg.MTLSEnabled() {
