@@ -29,3 +29,36 @@ func TestResponders_Load(t *testing.T) {
 		t.Errorf("Expected 'script response', got %s", responder.Response)
 	}
 }
+
+func responders() Responders {
+	r := Responders{}
+	r["/test1"] = Responder{}
+	r["/test3"] = Responder{}
+	r["/test5"] = Responder{}
+	r["*"] = Responder{}
+	return r
+}
+
+func BenchmarkResponders_Match_static(b *testing.B) {
+	r := responders()
+
+	for n := 0; n < b.N; n++ {
+		r.Match("/test1")
+	}
+}
+
+func BenchmarkResponders_Match_star(b *testing.B) {
+	r := responders()
+
+	for n := 0; n < b.N; n++ {
+		r.Match("*")
+	}
+}
+
+func BenchmarkResponders_Match_wildcard(b *testing.B) {
+	r := responders()
+
+	for n := 0; n < b.N; n++ {
+		r.Match("/test*")
+	}
+}
