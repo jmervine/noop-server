@@ -11,3 +11,6 @@
   response: '{"oh": "hi"}'
 "/endpoint*":
   status: 200
+"*":
+  status: 200
+  response: everything else

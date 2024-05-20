@@ -107,6 +107,54 @@ function listen {
 }
 ```
 
+## Reponder Script
+
+`noop-server` supports responding with configured values.
+
+### example
+
+#### script
+```
+# file: script.yaml
+---
+"/endpoint/1":
+  status: 200
+  sleep: 1000
+  response: Response for endpoint 1
+"/endpoint/2":
+  status: 404
+  response: 404 Not Found on endpoint 2
+"/endpoint/3":
+  status: 200
+  response: '{"oh": "hi"}'
+"/endpoint*":
+  status: 200
+"/*":
+  status: 200
+  response: everything else
+```
+
+#### run
+```
+noop-server -f script.yaml
+```
+
+#### responses
+```
+$ curl http://localhost:3000/
+everything else
+$ curl http://localhost:3000/endpoint/1
+Response for endpoint 1
+$ curl http://localhost:3000/endpoint/2
+404 Not Found on endpoint 2
+$ curl http://localhost:3000/endpoint/3
+{"oh": "hi"}
+$ curl http://localhost:3000/endpoint/WILD
+200 OK
+$ curl http://localhost:3000/
+everything else
+```
+
 ## mTLS Support
 
 **Warnings:**

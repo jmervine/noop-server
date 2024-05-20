@@ -17,6 +17,10 @@ func (r *Responders) Match(key string) (Responder, bool) {
 	}
 
 	for endpoint, responder := range *r {
+		if endpoint == "*" {
+			return responder, true
+		}
+
 		match, err := regexp.MatchString(endpoint, key)
 		if err != nil {
 			log.Fatal(err)
