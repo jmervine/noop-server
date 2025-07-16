@@ -1,7 +1,7 @@
 VERSION ?= v$(shell cat ./cmd/noop-server/version.go | grep Version | awk -F'"' '{print $$2}')
 SHA ?= $(shell git reflog | head -n1 | cut -d' ' -f1)
 
-default: test build
+default: test bin/noop-server
 
 .PHONY: test
 test:
